@@ -172,9 +172,11 @@ void ScanVisualization::paintGL()
     QVector3D colour(1.0,0.0,0.0);
     QVector3D pos(0.0,0.0,0.0);
     drawSmth(roomPoints,roomIndices,colour,pos);
-    for(int i=0;i<scaners->size();i++){
-        QVector3D colour2(0.0,1.0,0.0);
-        drawSmth(scanerPoints,scanerIndices,colour2,scaners->at(i)->getPos());
+    for(unsigned int i=0;i<scaners->size();i++){
+        if(scaners->at(i)->getStatus()==Scaner::working){
+            QVector3D colour2(0.0,1.0,0.0);
+            drawSmth(scanerPoints,scanerIndices,colour2,scaners->at(i)->getPos());
+        }
     }
 }
 

@@ -7,6 +7,7 @@
 #include <QNetworkDatagram>
 #include <iostream>
 #include "scanersetupwindow.h"
+#include "listwidgetitemscaner.h"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -38,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    for(int i=0;i<scaners.size();i++)
+    for(unsigned int i=0;i<scaners.size();i++)
         delete scaners[i];
     delete scv;
     delete settings;
@@ -118,9 +119,10 @@ void MainWindow::on_UDPRecive()
                         break;
                     }
                 if(i==scaners.size()){
-                    ui->scanerList->addItem(datagram.senderAddress().toString());
                     Scaner *sc=new Scaner(datagram.senderAddress());
                     scaners.push_back(sc);
+                    ListWidgetItemScaner *isc=new ListWidgetItemScaner(sc);
+                    ui->scanerList->addItem(isc);
                 }
             }
         }
@@ -138,14 +140,12 @@ void MainWindow::on_scanerFindTimerTimeout()
 void MainWindow::on_scanerList_itemClicked(QListWidgetItem *item)
 {
     item->setSelected(false);
-    QHostAddress IP(item->text());
-    for(unsigned int i=0;i<scaners.size();i++)
-        if(IP==scaners[i]->getIP()){
-            ScanerSetupWindow* w=new ScanerSetupWindow(this);
-            w->exec();
-            QVector3D pos=w->getScanerPos();
-            scaners[i]->setPos(pos);
-            delete w;
-        }
+    ListWidgetItemScaner *scitem=static_cast<ListWidgetItemScaner *>(item);
+    ScanerSetupWindow* w=new ScanerSetupWindow(this);
+    w->exec();
+    QVector3D pos=w->getScanerPos();
+    scitem->getScaner()->setPos(pos);
+    delete w;
+
 }
 

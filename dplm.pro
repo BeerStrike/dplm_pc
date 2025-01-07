@@ -9,6 +9,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    listwidgetitemscaner.cpp \
     main.cpp \
     mainwindow.cpp \
     networkconfigwindow.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
     scanvisualization.cpp
 
 HEADERS += \
+    listwidgetitemscaner.h \
     mainwindow.h \
     networkconfigwindow.h \
     roomparametersinputform.h \
