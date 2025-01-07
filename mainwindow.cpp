@@ -21,7 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
     settings->endGroup();
 
     settings->beginGroup("Room_parameters");
-    scv=new ScanVisualization(this,settings->value("Length").toFloat(),
+    scv=new ScanVisualization(this,&scaners,
+                                settings->value("Length").toFloat(),
                                 settings->value("X_step").toFloat(),
                                 settings->value("Width").toFloat(),
                                 settings->value("Z_step").toFloat(),
@@ -33,15 +34,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(scanerFindTimer, &QTimer::timeout,this, &on_scanerFindTimerTimeout);
     scanerFindTimer->setInterval(1000);
     scanerFindTimer->start();
-
-    ui->scanerList->addItem("1");
-    ui->scanerList->addItem("2");
-    ui->scanerList->addItem("3");
-
 }
 
 MainWindow::~MainWindow()
 {
+    for(int i=0;i<scaners.size();i++)
+        delete scaners[i];
     delete scv;
     delete settings;
     delete udpSocket;
@@ -98,7 +96,7 @@ void MainWindow::on_roonParametersConfigBtn_triggered()
     settings->endGroup();
     if(scv)
         delete scv;
-    scv=new ScanVisualization(this,w->getL(),w->getXStep(),w->getW(),w->getZStep(),w->getH());
+    scv=new ScanVisualization(this,&scaners,w->getL(),w->getXStep(),w->getW(),w->getZStep(),w->getH());
     delete w;
     ui->verticalLayout->insertWidget(0,scv);
     scv->show();
@@ -112,21 +110,17 @@ void MainWindow::on_UDPRecive()
         QJsonDocument jsonDoc = QJsonDocument::fromJson(datagram.data(),&error);
         if(error.error==QJsonParseError::NoError){
             QJsonObject  json = jsonDoc.object();
-            if(json["type"].toString()=="scaner_find_response"){
+            if(json["type"].toString()=="find_response"){
                 unsigned int i=0;
                 for(;i<scaners.size();i++)
-                    if(scaners[i].getIP()==datagram.senderAddress()){
-                        //изменение состояния
+                    if(scaners[i]->getIP()==datagram.senderAddress()){
+                        scaners[i]->respondHandler(json);
+                        break;
                     }
                 if(i==scaners.size()){
-                    //создать сканер
-                    if(json["status"].toString()=="unconfigured"){
-
-                    }else if(json["status"].toString()=="working"){
-
-                    }else{
-
-                    }
+                    ui->scanerList->addItem(datagram.senderAddress().toString());
+                    Scaner *sc=new Scaner(datagram.senderAddress());
+                    scaners.push_back(sc);
                 }
             }
         }
@@ -144,8 +138,14 @@ void MainWindow::on_scanerFindTimerTimeout()
 void MainWindow::on_scanerList_itemClicked(QListWidgetItem *item)
 {
     item->setSelected(false);
-    ScanerSetupWindow* w=new ScanerSetupWindow(this);
-    w->exec();
-    delete w;
+    QHostAddress IP(item->text());
+    for(unsigned int i=0;i<scaners.size();i++)
+        if(IP==scaners[i]->getIP()){
+            ScanerSetupWindow* w=new ScanerSetupWindow(this);
+            w->exec();
+            QVector3D pos=w->getScanerPos();
+            scaners[i]->setPos(pos);
+            delete w;
+        }
 }
 

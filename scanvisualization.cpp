@@ -3,31 +3,59 @@
 #include <QVector3D>
 #include <iostream>
 
-ScanVisualization::ScanVisualization(QWidget *pwgt,std::vector<Scaner> *scenerVec,float roomL,float xStep,float roomW,float zStep,float roomH):QOpenGLWidget(pwgt){
+void ScanVisualization::drawSmth(std::vector<GLfloat> &points, std::vector<GLint> &indices, QVector3D colour,QVector3D pos)
+{
+    QMatrix4x4 modelMatrix;
+    modelMatrix.scale(1.0f);
+    modelMatrix.translate(pos);
+    shader.setUniformValue("model", modelMatrix);
+    shader.setUniformValue("colour",colour);
+    GLuint coords_vbo = 0;
+    f->glGenBuffers(1, &coords_vbo);
+    f->glBindBuffer(GL_ARRAY_BUFFER, coords_vbo);
+    ef->glBufferData(GL_ARRAY_BUFFER, points.size() * 3*sizeof(GLfloat), &(points[0]), GL_STATIC_DRAW);
+    GLuint elementbuffer;
+    f->glGenBuffers(1, &elementbuffer);
+    f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+    ef->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(GLuint), &(indices[0]), GL_STATIC_DRAW);
+    GLuint vao = 0;
+    ef->glGenVertexArrays(1, &vao);
+    ef->glBindVertexArray(vao);
+    f->glBindBuffer(GL_ARRAY_BUFFER, coords_vbo);
+    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    f->glEnableVertexAttribArray(0);
+    f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+    ef->glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
+    ef->glDeleteVertexArrays(1, &vao);
+    f->glDeleteBuffers(1, &coords_vbo);
+    f->glDeleteBuffers(1, &elementbuffer);
+}
+
+ScanVisualization::ScanVisualization(QWidget *pwgt,std::vector<Scaner*> *scanerVec,float roomL,float xStep,float roomW,float zStep,float roomH):QOpenGLWidget(pwgt){
     xPointsMax=roomL/xStep;
     zPointsMax=roomW/zStep;
     scaners=scanerVec;
     zoom=5;
     cameraYaw=45.0f;
     cameraPitch=0;
-    points={
-        -roomL/2,0,-roomW/2,
-        roomL/2,0,-roomW/2,
-        -roomL/2,0,roomW/2,
-        roomL/2,0,roomW/2,
+    roomPoints={
+        0,0,0,
+        roomL,0,0,
+        0,0,roomW,
+        roomL,0,roomW,
 
-        -roomL/2,roomH,-roomW/2,
-        roomL/2,roomH,-roomW/2,
-        -roomL/2,roomH,roomW/2,
-        roomL/2,roomH,roomW/2,
+        0,roomH,0,
+        roomL,roomH,0,
+        0,roomH,roomW,
+        roomL,roomH,roomW,
     };
     for(int i=0;i<=xPointsMax;i++)
         for(int j=0;j<=zPointsMax;j++){
-            points.push_back(-roomL/2+i*(roomL/xPointsMax));
-            points.push_back(0);
-            points.push_back(-roomW/2+j*(roomW/zPointsMax));
+            roomPoints.push_back(i*(roomL/xPointsMax));
+            roomPoints.push_back(0);
+            roomPoints.push_back(j*(roomW/zPointsMax));
         }
-    indices= {  0,1,
+    roomIndices= {  0,1,
         0,2,
         3,1,
         3,2,
@@ -44,16 +72,42 @@ ScanVisualization::ScanVisualization(QWidget *pwgt,std::vector<Scaner> *scenerVe
     };
     for(int j=0;j<xPointsMax;j++){
         for(int i=0;i<zPointsMax;i++){
-                indices.push_back(8+i+j*(xPointsMax+1));
-                indices.push_back(8+i+(xPointsMax+1)+j*(xPointsMax+1));
-                indices.push_back(8+i+j*(xPointsMax+1));
-                indices.push_back(8+i+1+j*(xPointsMax+1));
+                roomIndices.push_back(8+i+j*(xPointsMax+1));
+                roomIndices.push_back(8+i+(xPointsMax+1)+j*(xPointsMax+1));
+                roomIndices.push_back(8+i+j*(xPointsMax+1));
+                roomIndices.push_back(8+i+1+j*(xPointsMax+1));
 
             }
     }
-    camTarget.setX(0.0f);
+    scanerPoints={
+        -0.5,-0.5,-0.5,
+        0.5,-0.5,-0.5,
+        -0.5,-0.5,0.5,
+        0.5,-0.5,0.5,
+
+        -0.5,0.5,-0.5,
+        0.5,0.5,-0.5,
+        -0.5,0.5,0.5,
+        0.5,0.5,0.5,
+    };
+    scanerIndices= { 0,1,
+            0,2,
+            3,1,
+            3,2,
+
+            4,5,
+            4,6,
+            7,5,
+            7,6,
+
+            0,4,
+            1,5,
+            2,6,
+            3,7
+        };
+    camTarget.setX(roomL/2);
     camTarget.setY(roomH/2);
-    camTarget.setZ(0.0f);
+    camTarget.setZ(roomW/2);
 }
 
 void ScanVisualization::setZoom(int percent){
@@ -79,7 +133,7 @@ void ScanVisualization::setCamPitch(float pitch)
 
 void ScanVisualization::setPointHeight(int x, int z, float height)
 {
-    points[3*(x+(xPointsMax+1)*z)+1+3*8]=height;
+    roomPoints[3*(x+(xPointsMax+1)*z)+1+3*8]=height;
 }
 
 void ScanVisualization::initializeGL()
@@ -99,12 +153,8 @@ void ScanVisualization::paintGL()
     f->glEnable(GL_DEPTH_TEST);
     f->glDepthFunc(GL_LESS);
 
-    QMatrix4x4 modelMatrix;
     QMatrix4x4 viewMatrix;
-    QMatrix4x4 projectionMatrix;
-    modelMatrix.scale(1.0f);
-    modelMatrix.translate(0.0,0.0,0.0);
-
+    QMatrix4x4 projectionMatrix;   
     QVector3D cameraPosition(zoom*cos(cameraYaw/360*2*M_PI)*sin(cameraPitch/360*2*M_PI),
                              zoom*sin(cameraYaw/360*2*M_PI),
                              zoom*cos(cameraYaw/360*2*M_PI)*cos(cameraPitch/360*2*M_PI));
@@ -117,29 +167,15 @@ void ScanVisualization::paintGL()
 
     f->glViewport(0, 0, this->size().width(), this->size().height());
     shader.bind();
-    shader.setUniformValue("model", modelMatrix);
     shader.setUniformValue("view", viewMatrix);
     shader.setUniformValue("projection", projectionMatrix);
-
-    GLuint coords_vbo = 0;
-    f->glGenBuffers(1, &coords_vbo);
-    f->glBindBuffer(GL_ARRAY_BUFFER, coords_vbo);
-    ef->glBufferData(GL_ARRAY_BUFFER, points.size() * 3*sizeof(GLfloat), &(points[0]), GL_STATIC_DRAW);
-    GLuint elementbuffer;
-    f->glGenBuffers(1, &elementbuffer);
-    f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-    ef->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(GLuint), &(indices[0]), GL_STATIC_DRAW);
-    GLuint vao = 0;
-    ef->glGenVertexArrays(1, &vao);
-    ef->glBindVertexArray(vao);
-    f->glBindBuffer(GL_ARRAY_BUFFER, coords_vbo);
-    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    f->glEnableVertexAttribArray(0);
-    f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-    ef->glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
-    ef->glDeleteVertexArrays(1, &vao);
-    f->glDeleteBuffers(1, &coords_vbo);
-    f->glDeleteBuffers(1, &elementbuffer);
+    QVector3D colour(1.0,0.0,0.0);
+    QVector3D pos(0.0,0.0,0.0);
+    drawSmth(roomPoints,roomIndices,colour,pos);
+    for(int i=0;i<scaners->size();i++){
+        QVector3D colour2(0.0,1.0,0.0);
+        drawSmth(scanerPoints,scanerIndices,colour2,scaners->at(i)->getPos());
+    }
 }
 
 void ScanVisualization::resizeGL(int w,int h)

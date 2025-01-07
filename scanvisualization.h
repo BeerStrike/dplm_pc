@@ -19,12 +19,15 @@ private:
     float cameraYaw;
     float cameraPitch;
     int zoom;
-    std::vector<GLfloat> points;
-    std::vector<GLint> indices;
+    std::vector<GLfloat> roomPoints;
+    std::vector<GLint> roomIndices;
+    std::vector<GLfloat> scanerPoints;
+    std::vector<GLint> scanerIndices;
     QVector3D camTarget;
-    std::vector<Scaner> *scaners;
+    std::vector<Scaner*> *scaners;
+    void drawSmth(std::vector<GLfloat> &points,std::vector<GLint> &indices,QVector3D colour,QVector3D pos);
 public:
-    ScanVisualization(QWidget *pwgt,float roomL,float xStep,float roomW,float zStep,float roomH);
+    ScanVisualization(QWidget *pwgt,std::vector<Scaner*> *scanerVec,float roomL,float xStep,float roomW,float zStep,float roomH);
     void setZoom(int percent);
     void setCamYaw(float yaw);
     void setCamPitch(float pitch);

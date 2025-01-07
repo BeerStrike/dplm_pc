@@ -47,7 +47,7 @@ private:
     QSettings *settings;
     QUdpSocket *udpSocket;
     QTimer *scanerFindTimer;
-    std::vector<Scaner> scaners;
+    std::vector<Scaner *> scaners;
 
 };
 #endif // MAINWINDOW_H
