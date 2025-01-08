@@ -4,6 +4,8 @@
 #include <QHostAddress>
 #include <QVector3D>
 #include <QTimer>
+#include <QJsonObject>
+
 class Scaner:public QObject
 {
     Q_OBJECT
@@ -13,6 +15,7 @@ public:
     void setPos(QVector3D pos);
     void respondHandler(QJsonObject &jsonResponse);
     QVector3D getPos();
+    QVector3D getLastScanPoint();
     ScanerStatus getStatus();
     QHostAddress getIP();
     QTimer *timeoutTimer;
@@ -20,6 +23,7 @@ signals:
     void statusChanged(ScanerStatus newStatus);
 private:
     QVector3D myPos;
+    QVector3D lastScanPoint;
     QHostAddress IP;
     ScanerStatus myStatus;
 private slots:

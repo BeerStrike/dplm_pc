@@ -111,21 +111,20 @@ void MainWindow::on_UDPRecive()
         QJsonDocument jsonDoc = QJsonDocument::fromJson(datagram.data(),&error);
         if(error.error==QJsonParseError::NoError){
             QJsonObject  json = jsonDoc.object();
-            if(json["type"].toString()=="find_response"){
-                unsigned int i=0;
-                for(;i<scaners.size();i++)
-                    if(scaners[i]->getIP()==datagram.senderAddress()){
-                        scaners[i]->respondHandler(json);
-                        break;
-                    }
-                if(i==scaners.size()){
-                    Scaner *sc=new Scaner(datagram.senderAddress());
-                    scaners.push_back(sc);
-                    ListWidgetItemScaner *isc=new ListWidgetItemScaner(sc);
-                    ui->scanerList->addItem(isc);
+            unsigned int i=0;
+            for(;i<scaners.size();i++)
+                if(scaners[i]->getIP()==datagram.senderAddress()){
+                    scaners[i]->respondHandler(json);
+                    break;
                 }
+            if(i==scaners.size()&&json["type"].toString()=="Find_response"){
+                Scaner *sc=new Scaner(datagram.senderAddress());
+                scaners.push_back(sc);
+                ListWidgetItemScaner *isc=new ListWidgetItemScaner(sc);
+                ui->scanerList->addItem(isc);
             }
-        }
+        }else
+                std::cerr<<error.errorString().toStdString();
     }
 }
 

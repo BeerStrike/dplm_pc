@@ -13,6 +13,7 @@ Scaner::Scaner(QHostAddress IPAdress)
 void Scaner::setPos(QVector3D pos)
 {
     myPos=pos;
+    lastScanPoint=pos;
     myStatus=working;
     emit statusChanged(myStatus);
 }
@@ -20,12 +21,28 @@ void Scaner::setPos(QVector3D pos)
 void Scaner::respondHandler(QJsonObject &jsonResponse)
 {
     timeoutTimer->start();
-    //обработка
+    if(jsonResponse["type"].toString()=="Scan_result"){
+        float r=jsonResponse["Range"].toInt();
+        float yaw=jsonResponse["Yaw"].toDouble()/360.0f*2*M_PI;
+        float pitch=jsonResponse["Pitch"].toDouble()/360.0f*2*M_PI;
+        //Пусть направлен вдоль оси х из 0 h 0
+        float x=myPos.y()*atan(yaw)*cos(pitch);
+        float z=myPos.y()*atan(yaw)*sin(pitch);
+        float h=myPos.y()-r*sin(yaw);
+        lastScanPoint.setX(x);
+        lastScanPoint.setY(h);
+        lastScanPoint.setZ(z);
+    }
 }
 
 QVector3D Scaner::getPos()
 {
     return myPos;
+}
+
+QVector3D Scaner::getLastScanPoint()
+{
+    return lastScanPoint;
 }
 
 Scaner::ScanerStatus Scaner::getStatus()
@@ -40,6 +57,6 @@ QHostAddress Scaner::getIP()
 
 void Scaner::on_timeout()
 {
-    myStatus=timeout;
+    //myStatus=timeout;
     emit statusChanged(myStatus);
 }

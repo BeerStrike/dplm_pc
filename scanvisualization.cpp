@@ -158,6 +158,7 @@ void ScanVisualization::paintGL()
     QVector3D cameraPosition(zoom*cos(cameraYaw/360*2*M_PI)*sin(cameraPitch/360*2*M_PI),
                              zoom*sin(cameraYaw/360*2*M_PI),
                              zoom*cos(cameraYaw/360*2*M_PI)*cos(cameraPitch/360*2*M_PI));
+    cameraPosition+=camTarget;
     QVector3D up(0.0f, 1.0f, 0.0f);
 
     viewMatrix.lookAt(cameraPosition, camTarget, up);
@@ -176,6 +177,17 @@ void ScanVisualization::paintGL()
         if(scaners->at(i)->getStatus()==Scaner::working){
             QVector3D colour2(0.0,1.0,0.0);
             drawSmth(scanerPoints,scanerIndices,colour2,scaners->at(i)->getPos());
+            std::vector<GLfloat> p3(6);
+            p3[0]=scaners->at(i)->getPos().x();
+            p3[1]=scaners->at(i)->getPos().y();
+            p3[2]=scaners->at(i)->getPos().z();
+            p3[3]=scaners->at(i)->getLastScanPoint().x();
+            p3[4]=scaners->at(i)->getLastScanPoint().y();
+            p3[5]=scaners->at(i)->getLastScanPoint().z();
+            std::vector<GLint> i3(2);
+            i3[0]=0;
+            i3[1]=1;
+            drawSmth(p3,i3,colour2,pos);
         }
     }
 }
