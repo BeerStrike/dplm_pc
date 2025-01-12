@@ -1,8 +1,14 @@
 #include "scaner.h"
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QTcpSocket>
+#include <iostream>
 #define MY_TIMEOUT 3000
-Scaner::Scaner(QHostAddress IPAdress)
+Scaner::Scaner(QHostAddress IPAdress,int udpPort)
 {
     IP=IPAdress;
+    port=udpPort;
     myStatus=unconfigured;
     timeoutTimer=new QTimer(this);
     connect(timeoutTimer, &QTimer::timeout,this, &on_timeout);
@@ -28,10 +34,11 @@ void Scaner::respondHandler(QJsonObject &jsonResponse)
         //Пусть направлен вдоль оси х из 0 h 0
         float x=myPos.y()*atan(yaw)*cos(pitch);
         float z=myPos.y()*atan(yaw)*sin(pitch);
-        float h=myPos.y()-r*sin(yaw);
+        float h=myPos.y()-r*cos(yaw);
         lastScanPoint.setX(x);
         lastScanPoint.setY(h);
         lastScanPoint.setZ(z);
+        emit recivePointHeight(x,z,h);
     }
 }
 
@@ -54,6 +61,32 @@ QHostAddress Scaner::getIP()
 {
     return IP;
 }
+
+void Scaner::sendPointsToScan(std::vector<std::pair<float, float>> &pointsToScan)
+{
+    QTcpSocket *sct=new QTcpSocket();
+    sct->connectToHost(IP,port);
+        QJsonObject json;
+    json.insert("Type","Angles_to_scan");
+    QJsonArray anglesArray;
+    for(int i=0;i<pointsToScan.size();i++){
+        QJsonObject jsonPoint;
+        float yaw=atan(sqrt(pow(pointsToScan.at(i).first,2)+pow(pointsToScan.at(i).second,2))/myPos.y())/M_PI*180;
+        float pitch=atan(pointsToScan.at(i).first/pointsToScan.at(i).second)/M_PI*180;
+        jsonPoint.insert("Yaw",yaw);
+        jsonPoint.insert("Pitch",pitch);
+        anglesArray.push_back(jsonPoint);
+    }
+    json.insert("Angles_array",anglesArray);
+    sct->waitForConnected();
+    QJsonDocument doc;
+    doc.setObject(json);
+    sct->write(doc.toJson());
+    sct->waitForBytesWritten();
+    sct->disconnectFromHost();
+    delete sct;
+}
+
 
 void Scaner::on_timeout()
 {

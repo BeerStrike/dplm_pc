@@ -34,6 +34,8 @@ void ScanVisualization::drawSmth(std::vector<GLfloat> &points, std::vector<GLint
 ScanVisualization::ScanVisualization(QWidget *pwgt,std::vector<Scaner*> *scanerVec,float roomL,float xStep,float roomW,float zStep,float roomH):QOpenGLWidget(pwgt){
     xPointsMax=roomL/xStep;
     zPointsMax=roomW/zStep;
+    stepX=xStep;
+    stepZ=zStep;
     scaners=scanerVec;
     zoom=5;
     cameraYaw=45.0f;
@@ -134,6 +136,11 @@ void ScanVisualization::setCamPitch(float pitch)
 void ScanVisualization::setPointHeight(int x, int z, float height)
 {
     roomPoints[3*(x+(xPointsMax+1)*z)+1+3*8]=height;
+}
+
+void ScanVisualization::setHeightAt(float x, float z, float h)
+{
+    setPointHeight(round(x/stepX),round(z/stepZ),h);
 }
 
 void ScanVisualization::initializeGL()

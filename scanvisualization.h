@@ -18,6 +18,8 @@ private:
     int zPointsMax;
     float cameraYaw;
     float cameraPitch;
+    float stepX;
+    float stepZ;
     int zoom;
     std::vector<GLfloat> roomPoints;
     std::vector<GLint> roomIndices;
@@ -32,6 +34,7 @@ public:
     void setCamYaw(float yaw);
     void setCamPitch(float pitch);
     void setPointHeight(int x,int z,float height);
+    void setHeightAt(float x,float z,float h);
     virtual void initializeGL();
     virtual void paintGL();
     virtual void resizeGL(int w,int h);

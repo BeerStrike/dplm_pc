@@ -8,6 +8,9 @@
 #include <iostream>
 #include "scanersetupwindow.h"
 #include "listwidgetitemscaner.h"
+#include <QTcpSocket>
+#include <QJsonArray>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -118,7 +121,10 @@ void MainWindow::on_UDPRecive()
                     break;
                 }
             if(i==scaners.size()&&json["type"].toString()=="Find_response"){
-                Scaner *sc=new Scaner(datagram.senderAddress());
+                settings->beginGroup("Network_settings");
+                Scaner *sc=new Scaner(datagram.senderAddress(),settings->value("Scaner_port").toInt());
+                settings->endGroup();
+                connect(sc,&Scaner::recivePointHeight,this,&on_reciveScanResult);
                 scaners.push_back(sc);
                 ListWidgetItemScaner *isc=new ListWidgetItemScaner(sc);
                 ui->scanerList->addItem(isc);
@@ -146,5 +152,26 @@ void MainWindow::on_scanerList_itemClicked(QListWidgetItem *item)
     scitem->getScaner()->setPos(pos);
     delete w;
 
+    settings->beginGroup("Room_parameters");
+    float xMax=settings->value("Width").toFloat();
+    float zMax=settings->value("Length").toFloat();
+    float xStep=settings->value("X_step").toFloat();
+    float zStep=settings->value("Z_step").toFloat();
+    settings->endGroup();
+    std::vector<std::pair<float,float>> v;
+    for(int i=0;i<=xMax/xStep;i++)
+        for(int j=0;j<zMax/zStep;j++){
+            std::pair<float,float> p;
+            p.first=xStep*i;
+            p.second=zStep*j;
+            v.push_back(p);
+        }
+    scitem->getScaner()->sendPointsToScan(v);
+}
+
+void MainWindow::on_reciveScanResult(float x, float z, float h)
+{
+    scv->setHeightAt(x,z,h);
+    scv->repaint();
 }
 

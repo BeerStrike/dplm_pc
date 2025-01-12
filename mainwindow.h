@@ -41,6 +41,7 @@ private slots:
 
     void on_scanerList_itemClicked(QListWidgetItem *item);
 
+    void on_reciveScanResult(float x,float z,float h);
 private:
     Ui::MainWindow *ui;
     ScanVisualization *scv;
