@@ -37,17 +37,22 @@ private slots:
 
     void on_UDPRecive();
 
-    void on_scanerFindTimerTimeout();
-
-    void on_scanerList_itemClicked(QListWidgetItem *item);
 
     void on_reciveScanResult(float x,float z,float h);
+
+    void on_addScanerBtn_clicked();
+
+    void on_setupScanerBtn_clicked();
+
+    void on_deleteScanerBtn_clicked();
+
+    void on_findScanerBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
     ScanVisualization *scv;
     QSettings *settings;
     QUdpSocket *udpSocket;
-    QTimer *scanerFindTimer;
     std::vector<Scaner *> scaners;
 
 };

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>168</width>
-    <height>89</height>
+    <width>191</width>
+    <height>104</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,15 +23,15 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="PCPortInput"/>
+     </item>
      <item row="1" column="0">
       <widget class="QLabel" name="scanerPortLabel">
        <property name="text">
         <string>Порт сканера:</string>
        </property>
       </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="PCPortInput"/>
      </item>
      <item row="1" column="1">
       <widget class="QLineEdit" name="scanerPortInput"/>

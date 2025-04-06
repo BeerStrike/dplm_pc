@@ -2,17 +2,23 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
-#include <QTcpSocket>
 #include <iostream>
 #define MY_TIMEOUT 3000
+
 Scaner::Scaner(QHostAddress IPAdress,int udpPort)
 {
     IP=IPAdress;
     port=udpPort;
-    myStatus=unconfigured;
+    myStatus=not_connected;
+    sct=new QTcpSocket();
+    sct->connectToHost(IP,port);
+    connect(sct,&QTcpSocket::connected,this,&on_tcp_connected);
+    connect(sct,&QTcpSocket::readyRead,this,&on_tcp_recive);
+    connect(sct,&QTcpSocket::disconnected,this,&on_tcp_disconnected);
+
     timeoutTimer=new QTimer(this);
+    timeoutTimer->setInterval(1000);
     connect(timeoutTimer, &QTimer::timeout,this, &on_timeout);
-    timeoutTimer->setInterval(MY_TIMEOUT);
     timeoutTimer->start();
 }
 
@@ -20,27 +26,8 @@ void Scaner::setPos(QVector3D pos)
 {
     myPos=pos;
     lastScanPoint=pos;
-    myStatus=working;
-    emit statusChanged(myStatus);
 }
 
-void Scaner::respondHandler(QJsonObject &jsonResponse)
-{
-    timeoutTimer->start();
-    if(jsonResponse["type"].toString()=="Scan_result"){
-        float r=jsonResponse["Range"].toInt();
-        float yaw=jsonResponse["Yaw"].toDouble()/360.0f*2*M_PI;
-        float pitch=jsonResponse["Pitch"].toDouble()/360.0f*2*M_PI;
-        //Пусть направлен вдоль оси х из 0 h 0
-        float x=myPos.y()*atan(yaw)*cos(pitch);
-        float z=myPos.y()*atan(yaw)*sin(pitch);
-        float h=myPos.y()-r*cos(yaw);
-        lastScanPoint.setX(x);
-        lastScanPoint.setY(h);
-        lastScanPoint.setZ(z);
-        emit recivePointHeight(x,z,h);
-    }
-}
 
 QVector3D Scaner::getPos()
 {
@@ -62,34 +49,97 @@ QHostAddress Scaner::getIP()
     return IP;
 }
 
-void Scaner::sendPointsToScan(std::vector<std::pair<float, float>> &pointsToScan)
+void Scaner::sendScanParameters(float length,float width,float height,float step)
 {
-    QTcpSocket *sct=new QTcpSocket();
-    sct->connectToHost(IP,port);
-        QJsonObject json;
-    json.insert("Type","Angles_to_scan");
-    QJsonArray anglesArray;
-    for(int i=0;i<pointsToScan.size();i++){
-        QJsonObject jsonPoint;
-        float yaw=atan(sqrt(pow(pointsToScan.at(i).first,2)+pow(pointsToScan.at(i).second,2))/myPos.y())/M_PI*180;
-        float pitch=atan(pointsToScan.at(i).first/pointsToScan.at(i).second)/M_PI*180;
-        jsonPoint.insert("Yaw",yaw);
-        jsonPoint.insert("Pitch",pitch);
-        anglesArray.push_back(jsonPoint);
-    }
-    json.insert("Angles_array",anglesArray);
-    sct->waitForConnected();
+    QJsonObject json;
+    json.insert("Type","Scan parameters");
+    json.insert("Length",length);
+    json.insert("Width",width);
+    json.insert("Height",height);
+    json.insert("Step",step);
     QJsonDocument doc;
     doc.setObject(json);
     sct->write(doc.toJson());
     sct->waitForBytesWritten();
-    sct->disconnectFromHost();
-    delete sct;
 }
 
+Scaner::~Scaner()
+{
+    sct->disconnectFromHost();
+    if(sct!=nullptr)
+        delete sct;
+    if(timeoutTimer!=nullptr)
+        delete timeoutTimer;
+}
+
+void Scaner::on_tcp_connected()
+{
+    myStatus=connected;
+    emit statusChanged(myStatus);
+}
+
+void Scaner::on_tcp_recive()
+{
+    QByteArray data =sct->readAll();
+    char *d=data.data();
+    QJsonParseError error;
+    int st=0;
+    while(st<data.size()){
+        QByteArray subdata;
+        int ed=st+1;
+        int cntr=1;
+        for(;ed<data.size();ed++){
+            if(*(data.data()+ed)=='{')
+                cntr++;
+            if(*(data.data()+ed)=='}')
+                cntr--;
+            if(cntr==0)
+                break;
+        }
+        subdata.resize(ed-st+1);
+        memcpy(subdata.data(),data.data()+st,ed-st+1);
+        st=ed+1;
+        //TODO ???
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(subdata.data(),&error);
+        if(error.error==QJsonParseError::NoError){
+            QJsonObject  json = jsonDoc.object();
+            if(json["Type"].toString()=="Scan result"){
+                float r=json["Range"].toDouble();
+                float yaw=json["Yaw"].toDouble()/180.0f*M_PI;
+                float pitch=json["Pitch"].toDouble()/180.0f*M_PI;
+                //Пусть направлен вдоль оси х из 0 h
+                float h=myPos.y()-r*cos(yaw);
+                float x=r*sin(yaw)*cos(pitch);
+                float z=r*sin(yaw)*sin(pitch);
+                lastScanPoint.setX(x);
+                lastScanPoint.setY(h);
+                lastScanPoint.setZ(z);
+                emit recivePointHeight(x,z,h);
+            }else if(json["Type"].toString()=="State response"){
+                if(json["State"].toString()=="Wait for params")
+                    myStatus=unconfigured;
+                else if(json["State"].toString()=="Working")
+                    myStatus=working;
+                emit statusChanged(myStatus);
+            }
+        }
+    }
+}
+void Scaner::on_tcp_disconnected()
+{
+    myStatus=not_connected;
+    emit statusChanged(myStatus);
+}
 
 void Scaner::on_timeout()
 {
-    //myStatus=timeout;
-    emit statusChanged(myStatus);
+    if(myStatus==not_connected){
+        sct->connectToHost(IP,port);
+    }else{
+        QJsonObject json;
+        json.insert("Type","State request");
+        QJsonDocument doc;
+        doc.setObject(json);
+        sct->write(doc.toJson());
+    }
 }

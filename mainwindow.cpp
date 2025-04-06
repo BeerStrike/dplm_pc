@@ -8,8 +8,11 @@
 #include <iostream>
 #include "scanersetupwindow.h"
 #include "listwidgetitemscaner.h"
+#include "scaneraddwindow.h"
 #include <QTcpSocket>
 #include <QJsonArray>
+#include <ctime>
+#include <QNetworkInterface>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -27,17 +30,11 @@ MainWindow::MainWindow(QWidget *parent)
     settings->beginGroup("Room_parameters");
     scv=new ScanVisualization(this,&scaners,
                                 settings->value("Length").toFloat(),
-                                settings->value("X_step").toFloat(),
                                 settings->value("Width").toFloat(),
-                                settings->value("Z_step").toFloat(),
-                                settings->value("Height").toFloat());
+                                settings->value("Height").toFloat(),
+                                settings->value("Step").toFloat());
     settings->endGroup();
     ui->verticalLayout->insertWidget(0,scv);
-
-    scanerFindTimer=new QTimer(this);
-    connect(scanerFindTimer, &QTimer::timeout,this, &on_scanerFindTimerTimeout);
-    scanerFindTimer->setInterval(1000);
-    scanerFindTimer->start();
 }
 
 MainWindow::~MainWindow()
@@ -47,7 +44,6 @@ MainWindow::~MainWindow()
     delete scv;
     delete settings;
     delete udpSocket;
-    delete scanerFindTimer;
     delete ui;
 }
 
@@ -95,12 +91,11 @@ void MainWindow::on_roonParametersConfigBtn_triggered()
     settings->setValue("Width",w->getW());
     settings->setValue("Length",w->getL());
     settings->setValue("Height",w->getH());
-    settings->setValue("X_step",w->getXStep());
-    settings->setValue("Z_step",w->getZStep());
+    settings->setValue("Step",w->getStep());
     settings->endGroup();
     if(scv)
         delete scv;
-    scv=new ScanVisualization(this,&scaners,w->getL(),w->getXStep(),w->getW(),w->getZStep(),w->getH());
+    scv=new ScanVisualization(this,&scaners,w->getL(),w->getW(),w->getH(),w->getStep());
     delete w;
     ui->verticalLayout->insertWidget(0,scv);
     scv->show();
@@ -117,7 +112,6 @@ void MainWindow::on_UDPRecive()
             unsigned int i=0;
             for(;i<scaners.size();i++)
                 if(scaners[i]->getIP()==datagram.senderAddress()){
-                    scaners[i]->respondHandler(json);
                     break;
                 }
             if(i==scaners.size()&&json["type"].toString()=="Find_response"){
@@ -134,18 +128,25 @@ void MainWindow::on_UDPRecive()
     }
 }
 
-void MainWindow::on_scanerFindTimerTimeout()
+
+void MainWindow::on_reciveScanResult(float x, float z, float h)
 {
-    char b[32];
-    settings->beginGroup("Network_settings");
-    udpSocket->writeDatagram(b,QHostAddress::Broadcast,settings->value("Scaner_port").toInt());
-    settings->endGroup();
+    scv->setHeightAt(x,z,h);
+    scv->repaint();
 }
 
-void MainWindow::on_scanerList_itemClicked(QListWidgetItem *item)
+
+void MainWindow::on_addScanerBtn_clicked()
 {
-    item->setSelected(false);
-    ListWidgetItemScaner *scitem=static_cast<ListWidgetItemScaner *>(item);
+    ScanerAddWindow *w=new ScanerAddWindow(udpSocket,this);
+    w->exec();
+    delete w;
+}
+
+
+void MainWindow::on_setupScanerBtn_clicked()
+{
+    ListWidgetItemScaner *scitem=(ListWidgetItemScaner*)ui->scanerList->selectedItems().at(0);
     ScanerSetupWindow* w=new ScanerSetupWindow(this);
     w->exec();
     QVector3D pos=w->getScanerPos();
@@ -153,25 +154,31 @@ void MainWindow::on_scanerList_itemClicked(QListWidgetItem *item)
     delete w;
 
     settings->beginGroup("Room_parameters");
-    float xMax=settings->value("Width").toFloat();
-    float zMax=settings->value("Length").toFloat();
-    float xStep=settings->value("X_step").toFloat();
-    float zStep=settings->value("Z_step").toFloat();
+    scitem->getScaner()->sendScanParameters(settings->value("Width").toFloat(),settings->value("Length").toFloat(),
+                                            settings->value("Height").toFloat(),settings->value("Step").toFloat()
+                                            );
     settings->endGroup();
-    std::vector<std::pair<float,float>> v;
-    for(int i=0;i<=xMax/xStep;i++)
-        for(int j=0;j<zMax/zStep;j++){
-            std::pair<float,float> p;
-            p.first=xStep*i;
-            p.second=zStep*j;
-            v.push_back(p);
-        }
-    scitem->getScaner()->sendPointsToScan(v);
 }
 
-void MainWindow::on_reciveScanResult(float x, float z, float h)
+
+
+void MainWindow::on_deleteScanerBtn_clicked()
 {
-    scv->setHeightAt(x,z,h);
-    scv->repaint();
+    ListWidgetItemScaner *scitem=(ListWidgetItemScaner*)ui->scanerList->selectedItems().at(0);
+    //ui->scanerList->re;
+}
+
+
+void MainWindow::on_findScanerBtn_clicked()
+{
+    char b[32];
+    settings->beginGroup("Network_settings");
+    QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
+    for(int i=0;i<list.size();i++){
+        QList<QNetworkAddressEntry> entryList = list[i].addressEntries();
+        for(int j=0;j<entryList.size();j++)
+            udpSocket->writeDatagram(b,entryList[j].broadcast(),settings->value("Scaner_port").toInt());
+    }
+    settings->endGroup();
 }
 

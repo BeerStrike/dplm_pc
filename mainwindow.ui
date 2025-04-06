@@ -117,6 +117,34 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="findScanerBtn">
+        <property name="text">
+         <string>Поиск сканеров в сети</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addScanerBtn">
+        <property name="text">
+         <string>Добавить сканер</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="deleteScanerBtn">
+        <property name="text">
+         <string>Удалить сканер</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="setupScanerBtn">
+        <property name="text">
+         <string>Настроить сканер</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>

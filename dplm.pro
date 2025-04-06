@@ -15,6 +15,7 @@ SOURCES += \
     networkconfigwindow.cpp \
     roomparametersinputform.cpp \
     scaner.cpp \
+    scaneraddwindow.cpp \
     scanersetupwindow.cpp \
     scanvisualization.cpp
 
@@ -24,6 +25,7 @@ HEADERS += \
     networkconfigwindow.h \
     roomparametersinputform.h \
     scaner.h \
+    scaneraddwindow.h \
     scanersetupwindow.h \
     scanvisualization.h
 
@@ -31,6 +33,7 @@ FORMS += \
     mainwindow.ui \
     networkconfigwindow.ui \
     roomparametersinputform.ui \
+    scaneraddwindow.ui \
     scanersetupwindow.ui
 
 # Default rules for deployment.

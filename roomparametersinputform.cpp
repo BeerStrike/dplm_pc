@@ -24,14 +24,9 @@ float RoomParametersInputForm::getH()
     return ui->heightInput->text().toFloat();
 }
 
-float RoomParametersInputForm::getXStep()
+float RoomParametersInputForm::getStep()
 {
-    return ui->xStepInput->text().toFloat();
-}
-
-float RoomParametersInputForm::getZStep()
-{
-    return ui->zStepInput->text().toFloat();
+    return ui->stepInput->text().toFloat();
 }
 
 RoomParametersInputForm::~RoomParametersInputForm()
@@ -41,7 +36,7 @@ RoomParametersInputForm::~RoomParametersInputForm()
 
 void RoomParametersInputForm::on_OKBtn_clicked()
 {
-    if(getW()!=0&&getL()!=0&&getH()!=0)
+    if(getW()!=0&&getL()!=0&&getH()!=0&&getStep()!=0)
         this->close();
 }
 

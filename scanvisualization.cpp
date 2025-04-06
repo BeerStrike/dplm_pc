@@ -2,7 +2,6 @@
 #include <QMatrix4x4>
 #include <QVector3D>
 #include <iostream>
-
 void ScanVisualization::drawSmth(std::vector<GLfloat> &points, std::vector<GLint> &indices, QVector3D colour,QVector3D pos)
 {
     QMatrix4x4 modelMatrix;
@@ -31,11 +30,10 @@ void ScanVisualization::drawSmth(std::vector<GLfloat> &points, std::vector<GLint
     f->glDeleteBuffers(1, &elementbuffer);
 }
 
-ScanVisualization::ScanVisualization(QWidget *pwgt,std::vector<Scaner*> *scanerVec,float roomL,float xStep,float roomW,float zStep,float roomH):QOpenGLWidget(pwgt){
-    xPointsMax=roomL/xStep;
-    zPointsMax=roomW/zStep;
-    stepX=xStep;
-    stepZ=zStep;
+ScanVisualization::ScanVisualization(QWidget *pwgt,std::vector<Scaner*> *scanerVec,float roomL,float roomW,float roomH,float dotStep):QOpenGLWidget(pwgt){
+    step=dotStep;
+    xPointsMax=roomL/step;
+    zPointsMax=roomW/step;
     scaners=scanerVec;
     zoom=5;
     cameraYaw=45.0f;
@@ -107,6 +105,17 @@ ScanVisualization::ScanVisualization(QWidget *pwgt,std::vector<Scaner*> *scanerV
             2,6,
             3,7
         };
+    axisPoints={
+        0.0,0.0,0.0,
+        2*roomL,0.0,0.0,
+        0.0,0.0,2*roomW,
+        0.0,2*roomH,0.0,
+    };
+    axisIndices= {
+        0,1,
+        0,2,
+        0,3,
+    };
     camTarget.setX(roomL/2);
     camTarget.setY(roomH/2);
     camTarget.setZ(roomW/2);
@@ -135,23 +144,30 @@ void ScanVisualization::setCamPitch(float pitch)
 
 void ScanVisualization::setPointHeight(int x, int z, float height)
 {
-    roomPoints[3*(x+(xPointsMax+1)*z)+1+3*8]=height;
+    roomPoints[3*(z+(xPointsMax+1)*x)+1+3*8]=height;
 }
 
 void ScanVisualization::setHeightAt(float x, float z, float h)
 {
-    setPointHeight(round(x/stepX),round(z/stepZ),h);
+    setPointHeight(round(x/step),round(z/step),h);
 }
 
 void ScanVisualization::initializeGL()
 {
+    this->context()->format().setProfile(QSurfaceFormat::CoreProfile);
+    this->context()->format().setOption(QSurfaceFormat::DebugContext);
+    loger=new QOpenGLDebugLogger(this->context());
     f=this->context()->functions();
     ef=this->context()->extraFunctions();
+    loger->initialize();
+    connect(loger,&QOpenGLDebugLogger::messageLogged,this,&on_logRecive);
+    loger->startLogging();
     shader.addShaderFromSourceFile(QOpenGLShader::Vertex, "VertexShader.vert");
     shader.addShaderFromSourceFile(QOpenGLShader::Fragment, "FragmentShader.frag");
     shader.bindAttributeLocation("vertex_position",0);
     shader.bindAttributeLocation("vertex_colour",1);
     shader.link();
+
 }
 
 void ScanVisualization::paintGL()
@@ -172,18 +188,19 @@ void ScanVisualization::paintGL()
 
     projectionMatrix.perspective(45.0f, ((float)this->width())/this->height(), 0.1f, 100.0f);
 
-
     f->glViewport(0, 0, this->size().width(), this->size().height());
     shader.bind();
     shader.setUniformValue("view", viewMatrix);
     shader.setUniformValue("projection", projectionMatrix);
     QVector3D colour(1.0,0.0,0.0);
+    QVector3D colour2(1.0,1.0,1.0);
     QVector3D pos(0.0,0.0,0.0);
+    drawSmth(axisPoints,axisIndices,colour2,pos);
     drawSmth(roomPoints,roomIndices,colour,pos);
     for(unsigned int i=0;i<scaners->size();i++){
         if(scaners->at(i)->getStatus()==Scaner::working){
-            QVector3D colour2(0.0,1.0,0.0);
-            drawSmth(scanerPoints,scanerIndices,colour2,scaners->at(i)->getPos());
+            QVector3D colour3(0.0,1.0,0.0);
+            drawSmth(scanerPoints,scanerIndices,colour3,scaners->at(i)->getPos());
             std::vector<GLfloat> p3(6);
             p3[0]=scaners->at(i)->getPos().x();
             p3[1]=scaners->at(i)->getPos().y();
@@ -194,7 +211,7 @@ void ScanVisualization::paintGL()
             std::vector<GLint> i3(2);
             i3[0]=0;
             i3[1]=1;
-            drawSmth(p3,i3,colour2,pos);
+            drawSmth(p3,i3,colour3,pos);
         }
     }
 }
@@ -202,4 +219,9 @@ void ScanVisualization::paintGL()
 void ScanVisualization::resizeGL(int w,int h)
 {
     f->glViewport(0, 0, w, h);
+}
+
+void ScanVisualization::on_logRecive(const QOpenGLDebugMessage &debugMessage)
+{
+    std::cerr<<debugMessage.message().toStdString();
 }

@@ -16,8 +16,7 @@ public:
     float getW();
     float getL();
     float getH();
-    float getXStep();
-    float getZStep();
+    float getStep();
     ~RoomParametersInputForm();
 
 private slots:
