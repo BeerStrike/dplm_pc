@@ -1,7 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "roomparametersinputform.h"
-#include "networkconfigwindow.h"
+#include "settingsForms/roomparametersinputform.h"
+#include "settingsForms/networkconfigwindow.h"
+#include "scaneruartsetupwindow.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QNetworkDatagram>
@@ -68,12 +69,8 @@ void MainWindow::on_pitchSlider_sliderMoved(int position)
 
 void MainWindow::on_networkSettingsBtn_triggered()
 {
-    NetworkConfigWindow *w=new NetworkConfigWindow(this);
+    NetworkConfigWindow *w=new NetworkConfigWindow(settings,this);
     w->exec();
-    settings->beginGroup("Network_settings");
-    settings->setValue("PC_port",w->getPCPort());
-    settings->setValue("Scaner_port",w->getScanerPort());
-    settings->endGroup();
     if(udpSocket)
         delete udpSocket;
     udpSocket=new QUdpSocket(this);
@@ -85,18 +82,18 @@ void MainWindow::on_networkSettingsBtn_triggered()
 
 void MainWindow::on_roonParametersConfigBtn_triggered()
 {
-    RoomParametersInputForm *w=new RoomParametersInputForm(this);
+    RoomParametersInputForm *w=new RoomParametersInputForm(settings,this);
     w->exec();
-    settings->beginGroup("Room_parameters");
-    settings->setValue("Width",w->getW());
-    settings->setValue("Length",w->getL());
-    settings->setValue("Height",w->getH());
-    settings->setValue("Step",w->getStep());
-    settings->endGroup();
+    delete w;
     if(scv)
         delete scv;
-    scv=new ScanVisualization(this,&scaners,w->getL(),w->getW(),w->getH(),w->getStep());
-    delete w;
+    settings->beginGroup("Room_parameters");
+    scv=new ScanVisualization(this,&scaners,
+                                settings->value("Length").toFloat(),
+                                settings->value("Width").toFloat(),
+                                settings->value("Height").toFloat(),
+                                settings->value("Step").toFloat());
+    settings->endGroup();
     ui->verticalLayout->insertWidget(0,scv);
     scv->show();
 }
@@ -140,6 +137,13 @@ void MainWindow::on_addScanerBtn_clicked()
 {
     ScanerAddWindow *w=new ScanerAddWindow(udpSocket,this);
     w->exec();
+    if(w->isSuccess()){
+        Scaner *sc=new Scaner(w->getIP(),w->getPort());
+        connect(sc,&Scaner::recivePointHeight,this,&on_reciveScanResult);
+        scaners.push_back(sc);
+        ListWidgetItemScaner *isc=new ListWidgetItemScaner(sc);
+        ui->scanerList->addItem(isc);
+    }
     delete w;
 }
 
@@ -180,5 +184,13 @@ void MainWindow::on_findScanerBtn_clicked()
             udpSocket->writeDatagram(b,entryList[j].broadcast(),settings->value("Scaner_port").toInt());
     }
     settings->endGroup();
+}
+
+
+void MainWindow::on_scanerSetupUART_triggered()
+{
+    ScanerUARTSetupWindow* w=new ScanerUARTSetupWindow(this);
+    w->exec();
+    delete w;
 }
 

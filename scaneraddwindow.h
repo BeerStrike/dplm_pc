@@ -15,11 +15,16 @@ class ScanerAddWindow : public QDialog
 public:
     explicit ScanerAddWindow(QUdpSocket *sct,QWidget *parent = nullptr);
     ~ScanerAddWindow();
-
+    QHostAddress getIP();
+    int getPort();
+    bool isSuccess();
 private slots:
     void on_connectBtn_clicked();
 
 private:
+    QHostAddress ip;
+    int port;
+    bool success;
     QUdpSocket *udpSocket;
     Ui::ScanerAddWindow *ui;
 };

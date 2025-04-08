@@ -48,6 +48,8 @@ private slots:
 
     void on_findScanerBtn_clicked();
 
+    void on_scanerSetupUART_triggered();
+
 private:
     Ui::MainWindow *ui;
     ScanVisualization *scv;

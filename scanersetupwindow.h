@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QVector3D>
+
 namespace Ui {
 class ScanerSetupWindow;
 }

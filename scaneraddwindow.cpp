@@ -6,7 +6,7 @@ ScanerAddWindow::ScanerAddWindow(QUdpSocket *sct,QWidget *parent)
     , ui(new Ui::ScanerAddWindow)
 {
     ui->setupUi(this);
-    udpSocket=sct;
+    success=false;
 }
 
 ScanerAddWindow::~ScanerAddWindow()
@@ -14,11 +14,29 @@ ScanerAddWindow::~ScanerAddWindow()
     delete ui;
 }
 
+QHostAddress ScanerAddWindow::getIP()
+{
+    return ip;
+}
+
+int ScanerAddWindow::getPort()
+{
+    return port;
+}
+
+bool ScanerAddWindow::isSuccess()
+{
+    return success;
+}
+
 void ScanerAddWindow::on_connectBtn_clicked()
 {
-    char b[32];
-    int port=ui->portInput->text().toInt();
-    QHostAddress addr(ui->IPInput->text());
-    udpSocket->writeDatagram(b,addr,port);
+    if(!ui->portInput->text().isNull()&&!ui->IPInput->text().isNull()){
+        port=ui->portInput->text().toInt();
+        QHostAddress addr(ui->IPInput->text());
+        ip=addr;
+        success=true;
+        this->close();
+    }
 }
 

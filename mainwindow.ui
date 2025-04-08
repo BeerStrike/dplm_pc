@@ -164,6 +164,7 @@
     </property>
     <addaction name="networkSettingsBtn"/>
     <addaction name="roonParametersConfigBtn"/>
+    <addaction name="scanerSetupUART"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -176,6 +177,11 @@
   <action name="roonParametersConfigBtn">
    <property name="text">
     <string>Настройка параметров комнаты</string>
+   </property>
+  </action>
+  <action name="scanerSetupUART">
+   <property name="text">
+    <string>Настроить сканер по UART</string>
    </property>
   </action>
  </widget>

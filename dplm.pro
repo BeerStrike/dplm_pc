@@ -1,4 +1,4 @@
-QT       += core gui opengl openglwidgets network
+QT       += core gui opengl openglwidgets network serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,29 +12,32 @@ SOURCES += \
     listwidgetitemscaner.cpp \
     main.cpp \
     mainwindow.cpp \
-    networkconfigwindow.cpp \
-    roomparametersinputform.cpp \
     scaner.cpp \
     scaneraddwindow.cpp \
     scanersetupwindow.cpp \
-    scanvisualization.cpp
+    scaneruartsetupwindow.cpp \
+    scanvisualization.cpp \
+    settingsForms/networkconfigwindow.cpp \
+    settingsForms/roomparametersinputform.cpp
 
 HEADERS += \
     listwidgetitemscaner.h \
     mainwindow.h \
-    networkconfigwindow.h \
-    roomparametersinputform.h \
     scaner.h \
     scaneraddwindow.h \
     scanersetupwindow.h \
-    scanvisualization.h
+    scaneruartsetupwindow.h \
+    scanvisualization.h \
+    settingsForms/networkconfigwindow.h \
+    settingsForms/roomparametersinputform.h
 
 FORMS += \
     mainwindow.ui \
-    networkconfigwindow.ui \
-    roomparametersinputform.ui \
     scaneraddwindow.ui \
-    scanersetupwindow.ui
+    scanersetupwindow.ui \
+    scaneruartsetupwindow.ui \
+    settingsForms/networkconfigwindow.ui \
+    settingsForms/roomparametersinputform.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
