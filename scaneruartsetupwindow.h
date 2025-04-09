@@ -20,7 +20,7 @@ private slots:
 
     void on_saveBtn_clicked();
 
-    void on_UART_recive();
+    void on_UARTRecive();
 private:
     QSerialPort *port;
     QByteArray jsonStr;

@@ -21,7 +21,7 @@ ScanerUARTSetupWindow::ScanerUARTSetupWindow(QWidget *parent)
     port->setStopBits(QSerialPort::OneStop);
     port->setParity(QSerialPort::NoParity);
     port->setFlowControl(QSerialPort::NoFlowControl);
-    connect(port,&QSerialPort::readyRead,this,&on_UART_recive);
+    connect(port,SIGNAL(readyRead()),this,SLOT(on_UARTRecive()));
     bracketCounter=0;
 }
 
@@ -69,9 +69,10 @@ void ScanerUARTSetupWindow::on_saveBtn_clicked()
     }
 }
 
-void ScanerUARTSetupWindow::on_UART_recive()
+void ScanerUARTSetupWindow::on_UARTRecive()
 {
     QByteArray data=port->readAll();
+    qDebug()<<(char*)data.data();
     if(bracketCounter!=0||data[0]=='{'){
         for(int i=0;i<data.size();i++){
             jsonStr.push_back(data[i]);
