@@ -6,31 +6,43 @@
 #include <QTimer>
 #include <QJsonObject>
 #include <QTcpSocket>
+#include <QSettings>
+#include "heightmap.h"
+#include "room.h"
 
 class Scaner:public QObject
 {
     Q_OBJECT
 public:
     enum ScanerStatus {unconfigured ,working,not_connected,connected};
-    Scaner(QHostAddress IPAdress,int udpPort);
+    Scaner(Room *rm,QHostAddress IPAdress,int port);
     void setPos(QVector3D pos);
     QVector3D getPos();
     QVector3D getLastScanPoint();
     ScanerStatus getStatus();
     QHostAddress getIP();
-    void sendScanParameters(float length,float width,float height,float step);
+    QString getName();
     ~Scaner();
 signals:
     void statusChanged(ScanerStatus newStatus);
-    void recivePointHeight(float x, float z, float h);
 private:
+    Room *rm;
+    QString scanerName;
     QTcpSocket *sct;
+    QByteArray rcvBuff;
+    int brcntr;
     QVector3D myPos;
     QVector3D lastScanPoint;
     QHostAddress IP;
+    HeightMap hm;
     int port;
     ScanerStatus myStatus;
     QTimer *timeoutTimer;
+    void stateResponseHandler(QJsonObject &json);
+    void stateHandler(QString stateName);
+    void scanResultHandler(QJsonObject &json);
+    void jsonProcessor(QJsonObject &json);
+    void sendScanParameters();
 private slots:
     void on_tcp_connected();
     void on_tcp_recive();

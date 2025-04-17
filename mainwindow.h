@@ -9,8 +9,9 @@
 #include <QUdpSocket>
 #include <scaner.h>
 #include <vector>
-#include "scanvisualization.h"
-
+#include "visualization/scanvisualizationwidget.h"
+#include "udpserver.h"
+#include "room.h"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -35,11 +36,6 @@ private slots:
 
     void on_roonParametersConfigBtn_triggered();
 
-    void on_UDPRecive();
-
-
-    void on_reciveScanResult(float x,float z,float h);
-
     void on_addScanerBtn_clicked();
 
     void on_setupScanerBtn_clicked();
@@ -50,11 +46,14 @@ private slots:
 
     void on_scanerSetupUART_triggered();
 
+    void on_findScaner(QHostAddress IP);
+
 private:
+    Room *room;
+    UdpServer *udpsrv;
     Ui::MainWindow *ui;
-    ScanVisualization *scv;
+    ScanVisualizationWidget *scv;
     QSettings *settings;
-    QUdpSocket *udpSocket;
     std::vector<Scaner *> scaners;
 
 };

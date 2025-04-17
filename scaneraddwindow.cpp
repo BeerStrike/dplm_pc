@@ -1,7 +1,7 @@
 #include "scaneraddwindow.h"
 #include "ui_scaneraddwindow.h"
 
-ScanerAddWindow::ScanerAddWindow(QUdpSocket *sct,QWidget *parent)
+ScanerAddWindow::ScanerAddWindow(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ScanerAddWindow)
 {

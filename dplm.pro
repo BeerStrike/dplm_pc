@@ -9,27 +9,45 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    heightmap.cpp \
     listwidgetitemscaner.cpp \
     main.cpp \
     mainwindow.cpp \
+    room.cpp \
     scaner.cpp \
     scaneraddwindow.cpp \
     scanersetupwindow.cpp \
     scaneruartsetupwindow.cpp \
-    scanvisualization.cpp \
     settingsForms/networkconfigwindow.cpp \
-    settingsForms/roomparametersinputform.cpp
+    settingsForms/roomparametersinputform.cpp \
+    udpserver.cpp \
+    visualization/axisvisualizartor.cpp \
+    visualization/basevisualizator.cpp \
+    visualization/camera.cpp \
+    visualization/heightmapvisualizator.cpp \
+    visualization/roomvisualizator.cpp \
+    visualization/scanervisualizator.cpp \
+    visualization/scanvisualizationwidget.cpp
 
 HEADERS += \
+    heightmap.h \
     listwidgetitemscaner.h \
     mainwindow.h \
+    room.h \
     scaner.h \
     scaneraddwindow.h \
     scanersetupwindow.h \
     scaneruartsetupwindow.h \
-    scanvisualization.h \
     settingsForms/networkconfigwindow.h \
-    settingsForms/roomparametersinputform.h
+    settingsForms/roomparametersinputform.h \
+    udpserver.h \
+    visualization/axisvisualizartor.h \
+    visualization/basevisualizator.h \
+    visualization/camera.h \
+    visualization/heightmapvisualizator.h \
+    visualization/roomvisualizator.h \
+    visualization/scanervisualizator.h \
+    visualization/scanvisualizationwidget.h
 
 FORMS += \
     mainwindow.ui \

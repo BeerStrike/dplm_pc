@@ -4,7 +4,7 @@
 ListWidgetItemScaner::ListWidgetItemScaner(Scaner *scaner):    QListWidgetItem(),QObject()
 {
     mysc=scaner;
-    this->setText(mysc->getIP().toString()+": нет соединения");
+    this->setText(mysc->getName()+": нет соединения");
     QObject::connect(mysc,&Scaner::statusChanged,this,&on_statusChange);
 }
 
@@ -17,16 +17,16 @@ void ListWidgetItemScaner::on_statusChange(Scaner::ScanerStatus newStatus)
 {
     switch (newStatus) {
     case Scaner::ScanerStatus::unconfigured:
-        this->setText(mysc->getIP().toString()+": нет конфигурании");
+        this->setText(mysc->getName()+": нет конфигурании");
         break;
     case Scaner::ScanerStatus::working:
-        this->setText(mysc->getIP().toString()+": работает");
+        this->setText(mysc->getName()+": работает");
         break;
     case Scaner::ScanerStatus::not_connected:
-        this->setText(mysc->getIP().toString()+": нет соединения");
+        this->setText(mysc->getName()+": нет соединения");
         break;
     case Scaner::ScanerStatus::connected:
-        this->setText(mysc->getIP().toString()+": соединено");
+        this->setText(mysc->getName()+": соединено");
         break;
     default:
         break;
