@@ -16,10 +16,10 @@ SOURCES += \
     room.cpp \
     scaner.cpp \
     scaneraddwindow.cpp \
-    scanersetupwindow.cpp \
-    scaneruartsetupwindow.cpp \
     settingsForms/networkconfigwindow.cpp \
     settingsForms/roomparametersinputform.cpp \
+    settingsForms/scanersetupwindow.cpp \
+    settingsForms/scaneruartsetupwindow.cpp \
     udpserver.cpp \
     visualization/axisvisualizartor.cpp \
     visualization/basevisualizator.cpp \
@@ -36,10 +36,10 @@ HEADERS += \
     room.h \
     scaner.h \
     scaneraddwindow.h \
-    scanersetupwindow.h \
-    scaneruartsetupwindow.h \
     settingsForms/networkconfigwindow.h \
     settingsForms/roomparametersinputform.h \
+    settingsForms/scanersetupwindow.h \
+    settingsForms/scaneruartsetupwindow.h \
     udpserver.h \
     visualization/axisvisualizartor.h \
     visualization/basevisualizator.h \
@@ -52,10 +52,10 @@ HEADERS += \
 FORMS += \
     mainwindow.ui \
     scaneraddwindow.ui \
-    scanersetupwindow.ui \
-    scaneruartsetupwindow.ui \
     settingsForms/networkconfigwindow.ui \
-    settingsForms/roomparametersinputform.ui
+    settingsForms/roomparametersinputform.ui \
+    settingsForms/scanersetupwindow.ui \
+    settingsForms/scaneruartsetupwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

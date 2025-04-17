@@ -2,12 +2,12 @@
 #include "ui_mainwindow.h"
 #include "settingsForms/roomparametersinputform.h"
 #include "settingsForms/networkconfigwindow.h"
-#include "scaneruartsetupwindow.h"
+#include "settingsForms/scaneruartsetupwindow.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QNetworkDatagram>
 #include <iostream>
-#include "scanersetupwindow.h"
+#include "settingsForms/scanersetupwindow.h"
 #include "listwidgetitemscaner.h"
 #include "scaneraddwindow.h"
 #include <QTcpSocket>
