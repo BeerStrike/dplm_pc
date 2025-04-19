@@ -8,7 +8,6 @@
 #include <QNetworkDatagram>
 #include <iostream>
 #include "settingsForms/scanersetupwindow.h"
-#include "listwidgetitemscaner.h"
 #include "scaneraddwindow.h"
 #include <QTcpSocket>
 #include <ctime>
@@ -97,9 +96,7 @@ void MainWindow::on_addScanerBtn_clicked()
     w->exec();
     if(w->isSuccess()){
         Scaner *sc=new Scaner(room,w->getIP(),w->getPort());
-        scaners.push_back(sc);
-        ListWidgetItemScaner *isc=new ListWidgetItemScaner(sc);
-        ui->scanerList->addItem(isc);
+        ui->scanerList->addItem(sc->getName());
     }
     delete w;
 }
@@ -107,20 +104,31 @@ void MainWindow::on_addScanerBtn_clicked()
 
 void MainWindow::on_setupScanerBtn_clicked()
 {
-    ListWidgetItemScaner *scitem=(ListWidgetItemScaner*)ui->scanerList->selectedItems().at(0);
-    ScanerSetupWindow* w=new ScanerSetupWindow(this);
-    w->exec();
-    QVector3D pos=w->getScanerPos();
-    scitem->getScaner()->setPos(pos);
-    delete w;
+    for(int i=0;i<scaners.size();i++){
+        if(scaners.at(i)->getName()==(ui->scanerList->currentItem())->text()){
+            ScanerSetupWindow* w=new ScanerSetupWindow(scaners.at(i),this);
+            w->exec();
+            delete w;
+            break;
+        }
+    }
 }
-
-
 
 void MainWindow::on_deleteScanerBtn_clicked()
 {
-    ListWidgetItemScaner *scitem=(ListWidgetItemScaner*)ui->scanerList->selectedItems().at(0);
-    //ui->scanerList->re;
+    int row=ui->scanerList->currentRow();
+    int i=0;
+    for(;i<scaners.size();i++)
+        if(scaners[i]==sm.key(ui->scanerList->currentItem()))
+            break;
+    delete scaners.at(i);
+    sm.remove(sm.key(ui->scanerList->currentItem()));
+    delete ui->scanerList->takeItem(row);
+    ui->scanerList->clearSelection();
+    for(;i<scaners.size()-1;i++){
+        scaners[i]=scaners[i+1];
+    }
+    scaners.resize(scaners.size()-1);
 }
 
 
@@ -151,8 +159,32 @@ void MainWindow::on_findScaner(QHostAddress IP)
         Scaner *sc=new Scaner(room,IP,settings->value("Scaner_port").toInt());
         settings->endGroup();
         scaners.push_back(sc);
-        ListWidgetItemScaner *isc=new ListWidgetItemScaner(sc);
-        ui->scanerList->addItem(isc);
+        connect(sc,SIGNAL(statusChanged(Scaner *)),this,SLOT(on_scanerStatusChanged(Scaner *)));
+        QListWidgetItem * iw=new QListWidgetItem(ui->scanerList);
+        iw->setText(sc->getName()+": нет соединения");
+        ui->scanerList->addItem(iw);
+        sm.insert(sc,iw);
     }
+}
+
+void MainWindow::on_scanerStatusChanged(Scaner * sc)
+{
+    QString statusText;
+    switch (sc->getStatus()){
+        case Scaner::unconfigured:
+            statusText="нет конфигурации";
+            break;
+        case Scaner::working:
+            statusText="работает";
+            break;
+        case Scaner::not_connected:
+            statusText="нет соединения";
+            break;
+        case Scaner::connected:
+            statusText="соединено";
+            break;
+
+    }
+    sm[sc]->setText(sc->getName()+": "+statusText);
 }
 

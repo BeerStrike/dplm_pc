@@ -2,17 +2,16 @@
 #define HEIGHTMAPVISUALIZATOR_H
 
 #include "basevisualizator.h"
-#include "heightmap.h"
+#include "baseheightmap.h"
 
 class HeightMapVisualizator : public BaseVisualizator
 {
     Q_OBJECT
 private:
-    HeightMap *hm;
-    double stp;
+    BaseHeightMap *hm;
     void heigntMapToPoints(QVector<GLdouble> &points,QVector<GLuint> &indices);
 public:
-    explicit HeightMapVisualizator(HeightMap * heightMap,double step,QObject *parent = nullptr);
+    explicit HeightMapVisualizator(BaseHeightMap * heightMap,QObject *parent = nullptr);
     void draw() override;
 };
 

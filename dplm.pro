@@ -9,8 +9,9 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    baseheightmap.cpp \
+    combinatedheightmap.cpp \
     heightmap.cpp \
-    listwidgetitemscaner.cpp \
     main.cpp \
     mainwindow.cpp \
     room.cpp \
@@ -30,8 +31,9 @@ SOURCES += \
     visualization/scanvisualizationwidget.cpp
 
 HEADERS += \
+    baseheightmap.h \
+    combinatedheightmap.h \
     heightmap.h \
-    listwidgetitemscaner.h \
     mainwindow.h \
     room.h \
     scaner.h \

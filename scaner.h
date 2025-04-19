@@ -15,7 +15,7 @@ class Scaner:public QObject
     Q_OBJECT
 public:
     enum ScanerStatus {unconfigured ,working,not_connected,connected};
-    Scaner(Room *rm,QHostAddress IPAdress,int port);
+    explicit Scaner(Room *rm,QHostAddress IPAdress,int port,QObject *parent = nullptr);
     void setPos(QVector3D pos);
     QVector3D getPos();
     QVector3D getLastScanPoint();
@@ -24,7 +24,7 @@ public:
     QString getName();
     ~Scaner();
 signals:
-    void statusChanged(ScanerStatus newStatus);
+    void statusChanged(Scaner *sc);
 private:
     Room *rm;
     QString scanerName;

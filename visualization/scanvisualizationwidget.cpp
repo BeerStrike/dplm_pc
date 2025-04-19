@@ -8,7 +8,7 @@ ScanVisualizationWidget::ScanVisualizationWidget(Room  *room,std::vector<Scaner*
     scvs(scanerVec),
     axvs(room->getRoomLength()*2,room->getRoomWidth()*2,room->getRoomHeight()*2),
     rmvs(room),
-    hmvs(room->getHeightMap(),room->getStep())
+    hmvs(room->getHeightMap())
 {
     rm=room;
     QVector3D camTarget(room->getRoomLength()/2,room->getRoomHeight()/2,room->getRoomWidth()/2);

@@ -9,9 +9,9 @@ void HeightMapVisualizator::heigntMapToPoints(QVector<GLdouble> &points,QVector<
 
     for(int i=0;i<xm;i++)
         for(int j=0;j<ym;j++){
-            points.push_back(i*stp);
-            points.push_back(hm->getHeightAt(i,j));
-            points.push_back(j*stp);
+            points.push_back(i*hm->getStep());
+            points.push_back(hm->getHeightAtPoint(i,j));
+            points.push_back(j*hm->getStep());
         }
     for(int i=0;i<xm;i++){
         for(int j=0;j<ym;j++){
@@ -27,11 +27,10 @@ void HeightMapVisualizator::heigntMapToPoints(QVector<GLdouble> &points,QVector<
     }
 }
 
-HeightMapVisualizator::HeightMapVisualizator(HeightMap * heightMap,double step,QObject *parent)
+HeightMapVisualizator::HeightMapVisualizator(BaseHeightMap * heightMap,QObject *parent)
     : BaseVisualizator{parent}
 {
     hm=heightMap;
-    stp=step;
 }
 
 void HeightMapVisualizator::draw()

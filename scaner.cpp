@@ -5,9 +5,11 @@
 #include <iostream>
 #define MY_TIMEOUT 3000
 
-Scaner::Scaner(Room *room,QHostAddress IPAdress,int udpPort):
-    hm(round(room->getRoomLength()/room->getStep())+1,
-         round(room->getRoomWidth()/room->getStep())+1)
+Scaner::Scaner(Room *room,QHostAddress IPAdress,int udpPort,QObject *parent):
+    QObject{parent},
+    hm(room->getRoomLength(),
+         room->getRoomWidth(),
+         room->getStep())
 {
     IP=IPAdress;
     port=udpPort;
@@ -95,19 +97,25 @@ void Scaner::stateResponseHandler(QJsonObject &json)
     if(name.size()>0&&name!=scanerName){
         scanerName=name;
         myPos=rm->getPosForScaner(name);
+        emit statusChanged(this);
     }
 }
 
 void Scaner::stateHandler(QString stateName)
 {
     if(stateName=="Wait for params"){
-        myStatus=unconfigured;
+        if(myStatus!=unconfigured){
+            myStatus=unconfigured;
+            emit statusChanged(this);
+        }
         if(!myPos.isNull())
             sendScanParameters();
     }
     else if(stateName=="Working")
-        myStatus=working;
-    emit statusChanged(myStatus);
+        if(myStatus!=working){
+            myStatus=working;
+            emit statusChanged(this);
+        }
 }
 
 void Scaner::scanResultHandler(QJsonObject &json)
@@ -122,7 +130,7 @@ void Scaner::scanResultHandler(QJsonObject &json)
     lastScanPoint.setX(x);
     lastScanPoint.setY(h);
     lastScanPoint.setZ(z);
-    hm.setHeightAt(round(x/rm->getStep()),round(z/rm->getStep()),h);
+    hm.setHeightAt(x,z,h);
 }
 
 void Scaner::jsonProcessor(QJsonObject &json)
@@ -137,7 +145,7 @@ void Scaner::jsonProcessor(QJsonObject &json)
 void Scaner::on_tcp_connected()
 {
     myStatus=connected;
-    emit statusChanged(myStatus);
+    emit statusChanged(this);
 }
 
 void Scaner::on_tcp_recive()
@@ -165,7 +173,7 @@ void Scaner::on_tcp_recive()
 void Scaner::on_tcp_disconnected()
 {
     myStatus=not_connected;
-    emit statusChanged(myStatus);
+    emit statusChanged(this);
 }
 
 void Scaner::on_timeout()

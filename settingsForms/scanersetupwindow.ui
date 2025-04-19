@@ -47,24 +47,24 @@
       <widget class="QLineEdit" name="xCordInput"/>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="zCordinateLabel">
+      <widget class="QLabel" name="yCordinateLabel">
        <property name="text">
-        <string>Координата z:</string>
+        <string>Координата y:</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="zCordInput"/>
+      <widget class="QLineEdit" name="yCordInput"/>
      </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="yCordinateLabel">
+      <widget class="QLabel" name="hCordinateLabel">
        <property name="text">
-        <string>Высота (координата y):</string>
+        <string>Высота</string>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLineEdit" name="yCordInput"/>
+      <widget class="QLineEdit" name="hCordInput"/>
      </item>
     </layout>
    </item>

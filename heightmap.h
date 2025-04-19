@@ -1,16 +1,25 @@
 #ifndef HEIGHTMAP_H
 #define HEIGHTMAP_H
 #include <vector>
-class HeightMap
+#include "baseheightmap.h"
+
+class HeightMap:BaseHeightMap
 {
+    Q_OBJECT
 private:
-    std::vector<std::vector<double>> map;
+    std::vector<std::vector<float>> map;
+    float stp;
 public:
-    HeightMap(int sizex,int sizey);
-    double getXSize();
-    double getYSize();
-    void setHeightAt(int x,int y,double height);
-    double getHeightAt(int x,int y);
+    HeightMap(float length,float width,float step,QObject *parent = nullptr);
+    int getXSize() override;
+    int getYSize() override;
+    float getLength() override;
+    float getWidth() override;
+    float getStep() override;
+    void setHeightAtPoint(int x,int y,float height);
+    void setHeightAt(float x,float y,float height);
+    float getHeightAt(float x,float y) override;
+    float getHeightAtPoint(int x,int y) override;
 };
 
 #endif // HEIGHTMAP_H

@@ -12,6 +12,7 @@
 #include "visualization/scanvisualizationwidget.h"
 #include "udpserver.h"
 #include "room.h"
+#include <QMap>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -48,11 +49,13 @@ private slots:
 
     void on_findScaner(QHostAddress IP);
 
+    void on_scanerStatusChanged(Scaner *sc);
 private:
     Room *room;
     UdpServer *udpsrv;
     Ui::MainWindow *ui;
     ScanVisualizationWidget *scv;
+    QMap<Scaner *,QListWidgetItem *> sm;
     QSettings *settings;
     std::vector<Scaner *> scaners;
 

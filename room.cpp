@@ -2,7 +2,7 @@
 #include <cmath>
 
 Room::Room(QString roomName,double room_length, double room_width, double room_height,double scan_step):
-    hm(round(room_length/scan_step)+1,round(room_width/scan_step)+1)
+    hm(room_length,room_width,scan_step)
 {
     length=room_length;
     width=room_width;
@@ -40,23 +40,11 @@ double Room::getStep()
     return step;
 }
 
-HeightMap *Room::getHeightMap()
+BaseHeightMap *Room::getHeightMap()
 {
     return &hm;
 }
 
-double Room::getHeightAt(double x, double y)
-{
-    if(x>=0&&x<=length&&y>=0&&y<=width)
-        return hm.getHeightAt(round(x/step),round(y/step));
-    else
-        return 0;
-}
-
-double Room::getHeightAtPoint(int x, int y)
-{
-    return hm.getHeightAt(x,y);
-}
 
 QVector3D Room::getPosForScaner(QString name)
 {
@@ -80,6 +68,11 @@ void Room::savePosOfScaner(QString name, QVector3D pos)
         settings->setValue("H",pos.z());
         settings->endGroup();
     }
+}
+
+void Room::addHeightMap(BaseHeightMap *heightMap,QVector3D scanerPos)
+{
+    hm.addHeightMap(heightMap,scanerPos);
 }
 
 Room::~Room()
