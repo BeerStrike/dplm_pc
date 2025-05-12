@@ -1,7 +1,7 @@
 #ifndef AXISVISUALIZARTOR_H
 #define AXISVISUALIZARTOR_H
-#include <vector>
-#include "visualization/basevisualizator.h"
+
+#include "basevisualizator.h"
 class AxisVisualizartor: public BaseVisualizator
 {
     Q_OBJECT
@@ -9,7 +9,7 @@ private:
     QVector<GLdouble> points;
     QVector<GLuint> indices;
 public:
-    explicit AxisVisualizartor(double xMax,double yMax,double zMax,QObject *parent = nullptr);
+    explicit AxisVisualizartor(ScanController *scController,QObject *parent = nullptr);
     void draw() override;
 };
 

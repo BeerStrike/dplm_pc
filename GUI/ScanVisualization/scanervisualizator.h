@@ -1,10 +1,10 @@
 #ifndef SCANERVISUALIZATOR_H
 #define SCANERVISUALIZATOR_H
-#include "scaner.h"
-#include "visualization/basevisualizator.h"
-#define SIZE_X 1.0
-#define SIZE_Y 1.0
-#define Scaner_HEIGHT 1.0
+#include "scancontroller.h"
+#include "basevisualizator.h"
+#define SCANER_LENGTH 0.06
+#define SCANER_WIDTH 0.02
+#define SCANER_HEIGHT 0.06
 
 class ScanerVisualizator:public BaseVisualizator
 {
@@ -13,9 +13,8 @@ private:
     QVector<GLdouble> points;
     QVector<GLuint> indices;
     QVector3D colour;
-    std::vector<Scaner *> * sc;
 public:
-    explicit ScanerVisualizator(std::vector<Scaner *> * scaners,QObject *parent = nullptr);
+    explicit ScanerVisualizator(ScanController *scController,QObject *parent = nullptr);
     void draw() override;
 };
 

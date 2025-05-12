@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QVector3D>
 #include "scaner.h"
+#include "room.h"
 namespace Ui {
 class ScanerSetupWindow;
 }
@@ -14,7 +15,6 @@ class ScanerSetupWindow : public QDialog
 public:
     explicit ScanerSetupWindow(Scaner *scaner,QWidget *parent = nullptr);
     ~ScanerSetupWindow();
-
 private slots:
     void on_OKButton_clicked();
 private:

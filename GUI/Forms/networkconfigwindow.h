@@ -14,8 +14,6 @@ class NetworkConfigWindow : public QDialog
 public:
     explicit NetworkConfigWindow(QSettings *stngs,QWidget *parent = nullptr);
     ~NetworkConfigWindow();
-    int getPCPort();
-    int getScanerPort();
 private slots:
     void on_OKButton_clicked();
 

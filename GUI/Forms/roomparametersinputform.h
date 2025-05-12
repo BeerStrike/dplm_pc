@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QSettings>
+#include "room.h"
 namespace Ui {
 class RoomParametersInputForm;
 }
@@ -13,14 +14,16 @@ class RoomParametersInputForm : public QDialog
 
 public:
     explicit RoomParametersInputForm(QSettings *stngs,QWidget *parent = nullptr);
+    Room *getRoom();
     ~RoomParametersInputForm();
 
 private slots:
-    void on_OKBtn_clicked();
-
+    void on_saveBtn_clicked();
+    void on_loadBtn_clicked();
 private:
-    QSettings *settings;
     Ui::RoomParametersInputForm *ui;
+    Room *room;
+    QSettings *settings;
 };
 
 #endif // ROOMPARAMETERSINPUTFORM_H

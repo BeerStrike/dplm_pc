@@ -2,9 +2,10 @@
 #define CAMERA_H
 #include <QVector3D>
 #include <QMatrix4x4>
-
-class Camera
+#include <QObject>
+class Camera: public QObject
 {
+    Q_OBJECT
 private:
     QVector3D target;
     double yaw;

@@ -5,14 +5,14 @@
 #include <iostream>
 #define MY_TIMEOUT 3000
 
-Scaner::Scaner(Room *room,QHostAddress IPAdress,int udpPort,QObject *parent):
+Scaner::Scaner(Room *room,QHostAddress IPAdress,int tcpPort,QObject *parent):
     QObject{parent},
     hm(room->getRoomLength(),
          room->getRoomWidth(),
-         room->getStep())
+         room->getMapStep())
 {
     IP=IPAdress;
-    port=udpPort;
+    port=tcpPort;
     myStatus=not_connected;
     sct=new QTcpSocket();
     sct->connectToHost(IP,port);
@@ -31,9 +31,10 @@ Scaner::Scaner(Room *room,QHostAddress IPAdress,int udpPort,QObject *parent):
     rm=room;
 }
 
-void Scaner::setPos(QVector3D pos)
+void Scaner::setParams(QVector3D pos,Direction direction)
 {
     myPos=pos;
+    dr=direction;
     lastScanPoint=pos;
     rm->savePosOfScaner(scanerName,myPos);
 }
@@ -42,6 +43,11 @@ void Scaner::setPos(QVector3D pos)
 QVector3D Scaner::getPos()
 {
     return myPos;
+}
+
+Scaner::Direction Scaner::getDirection()
+{
+    return dr;
 }
 
 QVector3D Scaner::getLastScanPoint()
@@ -67,16 +73,39 @@ QString Scaner::getName()
         return IP.toString();
 }
 
+BaseHeightMap *Scaner::getHeightMap()
+{
+    return &hm;
+}
+
 void Scaner::sendScanParameters()
 {
     QJsonObject json;
     json.insert("Type","Scan parameters");
-    json.insert("Length",rm->getRoomLength());
-    json.insert("Width",rm->getRoomWidth());
-    json.insert("Height",rm->getRoomHeight());
-    json.insert("Step",rm->getStep());
+    json.insert("Room length",rm->getRoomLength());
+    json.insert("Room width",rm->getRoomWidth());
+    json.insert("Room height",rm->getRoomHeight());
+    json.insert("Scan step",rm->getScanStep());
+    json.insert("Scaner X",myPos.x());
+    json.insert("Scaner Y",myPos.y());
+    json.insert("Scaner H",myPos.z());
+    switch(dr){
+        case xdyd:
+            json.insert("Scaner direction","xdyd");
+            break;
+        case xryd:
+            json.insert("Scaner direction","xryd");
+            break;
+        case xdyr:
+            json.insert("Scaner direction","xdyr");
+            break;
+        case xryr:
+            json.insert("Scaner direction","xryr");
+            break;
+    }
     QJsonDocument doc;
     doc.setObject(json);
+    QString j=doc.toJson();
     sct->write(doc.toJson());
     sct->waitForBytesWritten();
 }
@@ -96,7 +125,7 @@ void Scaner::stateResponseHandler(QJsonObject &json)
     QString name=json["Scaner name"].toString();
     if(name.size()>0&&name!=scanerName){
         scanerName=name;
-        myPos=rm->getPosForScaner(name);
+        //setPos(rm->getPosForScaner(name));
         emit statusChanged(this);
     }
 }
@@ -120,17 +149,15 @@ void Scaner::stateHandler(QString stateName)
 
 void Scaner::scanResultHandler(QJsonObject &json)
 {
-    double r=json["Range"].toDouble();
-    double yaw=json["Yaw"].toDouble()/180.0f*M_PI;
-    double pitch=json["Pitch"].toDouble()/180.0f*M_PI;
-    //Пусть направлен вдоль оси х из 0 h
-    double h=myPos.y()-r*cos(yaw);
-    double x=r*sin(yaw)*cos(pitch);
-    double z=r*sin(yaw)*sin(pitch);
-    lastScanPoint.setX(x);
-    lastScanPoint.setY(h);
-    lastScanPoint.setZ(z);
-    hm.setHeightAt(x,z,h);
+    QVector3D point;
+    point.setX(json["X"].toDouble());
+    point.setY(json["Y"].toDouble());
+    point.setZ(json["H"].toDouble());
+    lastScanPoint.setX(point.x());
+    lastScanPoint.setY(point.y());
+    lastScanPoint.setZ(point.z());
+    hm.addPoint(point);
+    emit recivedPoint();
 }
 
 void Scaner::jsonProcessor(QJsonObject &json)
@@ -161,6 +188,7 @@ void Scaner::on_tcp_recive()
         if(brcntr==0&&data[i]=='}'){
             QJsonParseError error;
             QJsonDocument jsonDoc = QJsonDocument::fromJson(rcvBuff.data(),&error);
+            qDebug()<<rcvBuff.data();
             if(error.error==QJsonParseError::NoError){
                 QJsonObject json=jsonDoc.object();
                 jsonProcessor(json);

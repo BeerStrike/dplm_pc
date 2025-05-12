@@ -4,11 +4,11 @@
 #include <QJsonDocument>
 #include <QNetworkInterface>
 
-UdpServer::UdpServer(int port,QObject *parent)
-    : QObject{parent}
+UdpServer::UdpServer(int pcPort,int scanersPort,QObject *parent)
+    : QObject{parent},scPort(scanersPort)
 {
     udpSocket=new QUdpSocket();
-    udpSocket->bind(QHostAddress::AnyIPv4,port);
+    udpSocket->bind(QHostAddress::AnyIPv4,pcPort);
     connect(udpSocket, SIGNAL(readyRead()),this, SLOT(on_UDPRecive()));
 }
 
@@ -28,15 +28,23 @@ void UdpServer::restart(int port)
     connect(udpSocket, SIGNAL(readyRead()),this, SLOT(on_UDPRecive()));
 }
 
-void UdpServer::searchScaners(int port)
+void UdpServer::searchScaners()
 {
-    char b[32];
+    QJsonObject json;
+    json.insert("Type","Find request");
+    QJsonDocument doc;
+    doc.setObject(json);
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
     for(int i=0;i<list.size();i++){
         QList<QNetworkAddressEntry> entryList = list[i].addressEntries();
         for(int j=0;j<entryList.size();j++)
-            udpSocket->writeDatagram(b,entryList[j].broadcast(),port);
+            udpSocket->writeDatagram(doc.toJson(),entryList[j].broadcast(),scPort);
     }
+}
+
+void UdpServer::setScanersPort(int port)
+{
+    scPort=port;
 }
 
 void UdpServer::on_UDPRecive()
@@ -47,8 +55,8 @@ void UdpServer::on_UDPRecive()
         QJsonDocument jsonDoc = QJsonDocument::fromJson(datagram.data(),&error);
         if(error.error==QJsonParseError::NoError){
             QJsonObject  json = jsonDoc.object();
-            if(json["type"].toString()=="Find_response"){
-                findScaner(datagram.senderAddress());
+            if(json["Type"].toString()=="Find response"){
+                emit findScaner(datagram.senderAddress(),datagram.senderPort());
             }
         }else
             qDebug()<<error.errorString().toStdString();

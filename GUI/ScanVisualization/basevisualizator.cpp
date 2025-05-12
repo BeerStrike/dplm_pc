@@ -1,11 +1,9 @@
 #include "basevisualizator.h"
 
 
-BaseVisualizator::BaseVisualizator(QObject *parent)
-    : QObject{parent}
-{
-    //cords_buff=indices_buff=vao=0;
-}
+BaseVisualizator::BaseVisualizator(ScanController *scController,QObject *parent)
+    : QObject{parent},scCtrl(scController)
+{}
 
 void BaseVisualizator::initalize(QOpenGLContext *context,QOpenGLShaderProgram *shader)
 {
@@ -30,16 +28,4 @@ GLuint BaseVisualizator::createIndicesBuff(QVector<GLuint> &indices){
     f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_buff);
     ef->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(GLuint), &(indices[0]), GL_STATIC_DRAW);
     return indices_buff;
-}
-
-BaseVisualizator::~BaseVisualizator()
-{
-    /*
-    if(vao!=0)
-        ef->glDeleteVertexArrays(1, &vao);
-    if(cords_buff!=0)
-        f->glDeleteBuffers(1, &cords_buff);
-    if(indices_buff!=0)
-        f->glDeleteBuffers(1, &indices_buff);
-*/
 }

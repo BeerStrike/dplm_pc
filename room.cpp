@@ -1,48 +1,59 @@
 #include "room.h"
 #include <cmath>
 
-Room::Room(QString roomName,double room_length, double room_width, double room_height,double scan_step):
-    hm(room_length,room_width,scan_step)
+Room::Room(QString roomFileName)
 {
-    length=room_length;
-    width=room_width;
-    height=room_height;
-    step=scan_step;
-    myName=roomName;
-    settings=new QSettings(roomName+"_settings.ini",QSettings::IniFormat);
-    /*
+    myFileName=roomFileName;
+    settings=new QSettings(roomFileName,QSettings::IniFormat);
     settings->beginGroup("Room_parameters");
     length=settings->value("Length").toFloat();
     width=settings->value("Width").toFloat();
     height=settings->value("Height").toFloat();
-    step=settings->value("Step").toFloat();
+    scanStep=settings->value("Scan_step").toFloat();
+    mapStep=settings->value("Map_step").toFloat();
     settings->endGroup();
-    */
 }
 
-double Room::getRoomWidth()
+float Room::getRoomWidth()
 {
     return width;
 }
 
-double Room::getRoomHeight()
+float Room::getRoomHeight()
 {
     return height;
 }
 
-double Room::getRoomLength()
+float Room::getRoomLength()
 {
     return length;
 }
 
-double Room::getStep()
+
+float Room::getScanStep()
 {
-    return step;
+    return scanStep;
 }
 
-BaseHeightMap *Room::getHeightMap()
+float Room::getMapStep()
 {
-    return &hm;
+    return mapStep;
+}
+
+void Room::changeRoomParams(float l, float w, float h, float scStep, float mpStep)
+{
+    settings->beginGroup("Room_parameters");
+    length=l;
+    settings->setValue("Length",length);
+    width=w;
+    settings->setValue("Width",width);
+    height=h;
+    settings->setValue("Height",height);
+    scanStep=scStep;
+    settings->setValue("Scan_step",scanStep);
+    mapStep=mpStep;
+    settings->setValue("Map_step",mapStep);
+    settings->endGroup();
 }
 
 
@@ -51,9 +62,9 @@ QVector3D Room::getPosForScaner(QString name)
     QVector3D pos;
     if(settings->childGroups().contains(name+"_scaner")){
         settings->beginGroup(name+"_scaner");
-        pos.setX(settings->value("X").toDouble());
-        pos.setY(settings->value("Y").toDouble());
-        pos.setZ(settings->value("H").toDouble());
+        pos.setX(settings->value("X").toFloat());
+        pos.setY(settings->value("Y").toFloat());
+        pos.setZ(settings->value("H").toFloat());
         settings->endGroup();
     }
     return pos;
@@ -70,19 +81,8 @@ void Room::savePosOfScaner(QString name, QVector3D pos)
     }
 }
 
-void Room::addHeightMap(BaseHeightMap *heightMap,QVector3D scanerPos)
-{
-    hm.addHeightMap(heightMap,scanerPos);
-}
-
 Room::~Room()
 {
-    settings->beginGroup("Room_parameters");
-    settings->setValue("Width",width);
-    settings->setValue("Length",length);
-    settings->setValue("Height",height);
-    settings->setValue("Step",step);
-    settings->endGroup();
     delete settings;
 }
 

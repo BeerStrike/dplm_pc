@@ -3,22 +3,21 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLExtraFunctions>
 
-ScanerVisualizator::ScanerVisualizator(std::vector<Scaner *> * scaners,QObject *parent)
-    : BaseVisualizator{parent} {
-    sc=scaners;
+ScanerVisualizator::ScanerVisualizator(ScanController *scController,QObject *parent)
+    : BaseVisualizator{scController,parent} {
     colour.setX(0.0);
     colour.setY(1.0);
     colour.setZ(0.0);
     points={
-        -0.5,-0.5,-0.5,
-        0.5,-0.5,-0.5,
-        -0.5,-0.5,0.5,
-        0.5,-0.5,0.5,
+        0,-SCANER_HEIGHT,0,
+        SCANER_LENGTH,-SCANER_HEIGHT,0,
+        0,-SCANER_HEIGHT,SCANER_WIDTH,
+        SCANER_LENGTH,-SCANER_HEIGHT,SCANER_WIDTH,
 
-        -0.5,0.5,-0.5,
-        0.5,0.5,-0.5,
-        -0.5,0.5,0.5,
-        0.5,0.5,0.5,
+        0,0,0,
+        SCANER_LENGTH,0,0,
+        0,0,SCANER_WIDTH,
+        SCANER_LENGTH,0,SCANER_WIDTH,
     };
     indices= { 0,1,
         0,2,
@@ -39,10 +38,14 @@ ScanerVisualizator::ScanerVisualizator(std::vector<Scaner *> * scaners,QObject *
 
 void ScanerVisualizator::draw(){
 
-    for(unsigned int i=0;i<sc->size();i++){
+    for(unsigned int i=0;i<scCtrl->getScanersNum();i++){
         QMatrix4x4 modelMatrix;
         modelMatrix.scale(1.0f);
-        modelMatrix.translate(sc->at(i)->getPos());
+        QVector3D scanerPos;
+        scanerPos.setX(scCtrl->getScaner(i)->getPos().y());
+        scanerPos.setY(scCtrl->getScaner(i)->getPos().z());
+        scanerPos.setZ(scCtrl->getScaner(i)->getPos().x());
+        modelMatrix.translate(scanerPos);
         sh->setUniformValue("model", modelMatrix);
         sh->setUniformValue("colour",colour);
 

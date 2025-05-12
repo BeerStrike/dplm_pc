@@ -1,43 +1,32 @@
-#include "roomvisualizator.h"
+#include "axisvisualizartor.h"
 
-RoomVisualizator::RoomVisualizator(Room *room,QObject *parent)
-    : BaseVisualizator{parent}
-{
+AxisVisualizartor::AxisVisualizartor(ScanController *scController,QObject *parent)
+    : BaseVisualizator{scController,parent} {
     points={
-        0,0,0,
-        room->getRoomLength(),0,0,
-        0,0,room->getRoomWidth(),
-        room->getRoomLength(),0,room->getRoomWidth(),
-
-        0,room->getRoomHeight(),0,
-        room->getRoomLength(),room->getRoomHeight(),0,
-        0,room->getRoomHeight(),room->getRoomWidth(),
-        room->getRoomLength(),room->getRoomHeight(),room->getRoomWidth(),
+        0.0,0.0,0.0,
+        1.0,0.0,0.0,
+        0.0,0.0,1.0,
+        0.0,1.0,0.0,
     };
-    indices= {  0,1,
+    indices= {
+        0,1,
         0,2,
-        3,1,
-        3,2,
-
-        4,5,
-        4,6,
-        7,5,
-        7,6,
-
-        0,4,
-        1,5,
-        2,6,
-        3,7
+        0,3,
     };
 }
 
-void RoomVisualizator::draw()
+void AxisVisualizartor::draw()
 {
     QMatrix4x4 modelMatrix;
-    modelMatrix.scale(1.0f);
+    QVector3D scale;
+    scale.setX(2*scCtrl->getRoom()->getRoomWidth());
+    scale.setY(2*scCtrl->getRoom()->getRoomHeight());
+    scale.setZ(2*scCtrl->getRoom()->getRoomLength());
+    modelMatrix.scale(scale);
+    QVector3D colour(1.0,1.0,1.0);
+    QVector3D pos(0.0,0.0,0.0);
+    modelMatrix.translate(pos);
     sh->setUniformValue("model", modelMatrix);
-    QVector3D colour(1.0,0.0,0.0);
-
     sh->setUniformValue("colour",colour);
 
     GLuint coords_vbo = createCordsBuff(points);

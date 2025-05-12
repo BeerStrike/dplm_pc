@@ -4,15 +4,6 @@ CombinatedHeightMap::CombinatedHeightMap(float length,float width,float step,QOb
     : BaseHeightMap{parent},l(length),w(width),stp(step)
 {}
 
-int CombinatedHeightMap::getXSize()
-{
-    return round(l/stp)+1;
-}
-
-int CombinatedHeightMap::getYSize()
-{
-    return round(w/stp)+1;
-}
 
 float CombinatedHeightMap::getLength()
 {
@@ -31,21 +22,19 @@ float CombinatedHeightMap::getStep()
 
 float CombinatedHeightMap::getHeightAt(float x, float y)
 {
-    int height=0;
-    int minDist=INT_MAX;
-    QVector3D p(x,y,0);
+    float height=0;
+    int n=0;
     for(int i=0;i<hmv.size();i++){
-        float d=scposv[i].distanceToPoint(p);
-        if(d<minDist){
-            minDist=d;
-            height=hmv[i]->getHeightAt(x,y);
+        float h=hmv[i]->getHeightAt(x,y);
+        if(h!=0){
+            height+=h;
+            n++;
         }
     }
-}
-
-float CombinatedHeightMap::getHeightAtPoint(int x, int y)
-{
-    getHeightAt(round(x/stp),round(y/stp));
+    if(n>0)
+        return height/n;
+    else
+        return 0;
 }
 
 void CombinatedHeightMap::addHeightMap(BaseHeightMap *hm, QVector3D scpos)

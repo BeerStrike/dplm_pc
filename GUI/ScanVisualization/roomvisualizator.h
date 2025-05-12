@@ -10,7 +10,7 @@ private:
     QVector<GLdouble> points;
     QVector<GLuint> indices;
 public:
-    explicit RoomVisualizator(Room *room,QObject *parent = nullptr);
+    explicit RoomVisualizator(ScanController *scController,QObject *parent = nullptr);
     void draw() override;
 
 };

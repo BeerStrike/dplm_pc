@@ -16,13 +16,10 @@ class CombinatedHeightMap : public BaseHeightMap
     float stp;
 public:
     explicit CombinatedHeightMap(float length,float width,float step,QObject *parent = nullptr);
-    int getXSize() override;
-    int getYSize() override;
     float getLength() override;
     float getWidth() override;
     float getStep() override;
     float getHeightAt(float x,float y) override;
-    float getHeightAtPoint(int x,int y) override;
     void addHeightMap(BaseHeightMap *hm,QVector3D scpos);
 };
 

@@ -4,14 +4,15 @@ void HeightMapVisualizator::heigntMapToPoints(QVector<GLdouble> &points,QVector<
 {
     points.clear();
     indices.clear();
-    int xm=hm->getXSize();
-    int ym=hm->getYSize();
+    int xm=round(scCtrl->getHeightMap()->getLength()/scCtrl->getHeightMap()->getStep())+1;
+    int ym=round(scCtrl->getHeightMap()->getWidth()/scCtrl->getHeightMap()->getStep())+1;
 
     for(int i=0;i<xm;i++)
         for(int j=0;j<ym;j++){
-            points.push_back(i*hm->getStep());
-            points.push_back(hm->getHeightAtPoint(i,j));
-            points.push_back(j*hm->getStep());
+            points.push_back(j*scCtrl->getHeightMap()->getStep());
+            points.push_back(scCtrl->getHeightMap()->getHeightAt(i*scCtrl->getHeightMap()->getStep(),j*scCtrl->getHeightMap()->getStep()));
+            points.push_back(i*scCtrl->getHeightMap()->getStep());
+
         }
     for(int i=0;i<xm;i++){
         for(int j=0;j<ym;j++){
@@ -27,11 +28,9 @@ void HeightMapVisualizator::heigntMapToPoints(QVector<GLdouble> &points,QVector<
     }
 }
 
-HeightMapVisualizator::HeightMapVisualizator(BaseHeightMap * heightMap,QObject *parent)
-    : BaseVisualizator{parent}
-{
-    hm=heightMap;
-}
+HeightMapVisualizator::HeightMapVisualizator(ScanController *scController,QObject *parent)
+    : BaseVisualizator{scController,parent}
+{}
 
 void HeightMapVisualizator::draw()
 {

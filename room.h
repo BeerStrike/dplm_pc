@@ -1,29 +1,30 @@
 #ifndef ROOM_H
 #define ROOM_H
-#include "combinatedheightmap.h"
 #include <QVector3D>
 #include <QSettings>
+#include <QObject>
 
-class Room
+class Room :public QObject
 {
+    Q_OBJECT
 private:
-    double height;
-    double length;
-    double width;
-    double step;
-    CombinatedHeightMap hm;
-    QString myName;
+    float height;
+    float length;
+    float width;
+    float scanStep;
+    float mapStep;
+    QString myFileName;
     QSettings *settings;
 public:
-    Room(QString roomName,double room_length,double room_width,double room_height,double scan_step);
-    double getRoomWidth();
-    double getRoomHeight();
-    double getRoomLength();
-    double getStep();
-    BaseHeightMap *getHeightMap();
+    Room(QString roomFileName);
+    float getRoomWidth();
+    float getRoomHeight();
+    float getRoomLength();
+    float getScanStep();
+    float getMapStep();
+    void changeRoomParams(float l,float w,float h,float scStep,float mpStep);
     QVector3D getPosForScaner(QString name);
     void savePosOfScaner(QString name,QVector3D pos);
-    void addHeightMap(BaseHeightMap *heightMap,QVector3D scanerPos);
     ~Room();
 };
 

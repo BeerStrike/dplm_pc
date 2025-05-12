@@ -23,7 +23,16 @@ void ScanerSetupWindow::on_OKButton_clicked()
     pos.setX(ui->xCordInput->text().toFloat());
     pos.setY(ui->yCordInput->text().toFloat());
     pos.setZ(ui->hCordInput->text().toFloat());
-    sc->setPos(pos);
+
+    Scaner::Direction dr;
+    if(ui->xdydBtn->isChecked())
+        dr=Scaner::xdyd;
+    else if(ui->xrydBtn->isChecked())
+        dr=Scaner::xdyr;
+    else if(ui->xdyrBtn->isChecked())
+        dr=Scaner::xryd;
+    else
+        dr=Scaner::xryr;
+    sc->setParams(pos,dr);
     this->close();
 }
-

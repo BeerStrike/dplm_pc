@@ -9,55 +9,61 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    GUI/mainwindow.cpp \
+    GUI/scanersmanadgerwidget.cpp \
+    GUI/scanvisualizatorwidget.cpp \
     baseheightmap.cpp \
     combinatedheightmap.cpp \
     heightmap.cpp \
     main.cpp \
-    mainwindow.cpp \
     room.cpp \
+    scancontroller.cpp \
     scaner.cpp \
-    scaneraddwindow.cpp \
-    settingsForms/networkconfigwindow.cpp \
-    settingsForms/roomparametersinputform.cpp \
-    settingsForms/scanersetupwindow.cpp \
-    settingsForms/scaneruartsetupwindow.cpp \
     udpserver.cpp \
-    visualization/axisvisualizartor.cpp \
-    visualization/basevisualizator.cpp \
-    visualization/camera.cpp \
-    visualization/heightmapvisualizator.cpp \
-    visualization/roomvisualizator.cpp \
-    visualization/scanervisualizator.cpp \
-    visualization/scanvisualizationwidget.cpp
+    GUI/Forms/scaneraddwindow.cpp \
+    GUI/Forms/networkconfigwindow.cpp \
+    GUI/Forms/roomparametersinputform.cpp \
+    GUI/Forms/scanersetupwindow.cpp \
+    GUI/Forms/scaneruartsetupwindow.cpp \
+    GUI/ScanVisualization/axisvisualizartor.cpp \
+    GUI/ScanVisualization/basevisualizator.cpp \
+    GUI/ScanVisualization/camera.cpp \
+    GUI/ScanVisualization/heightmapvisualizator.cpp \
+    GUI/ScanVisualization/roomvisualizator.cpp \
+    GUI/ScanVisualization/scanervisualizator.cpp \
+    GUI/ScanVisualization/scanvisualizationwidget.cpp
 
 HEADERS += \
+    GUI/mainwindow.h \
+    GUI/scanersmanadgerwidget.h \
+    GUI/scanvisualizatorwidget.h \
     baseheightmap.h \
     combinatedheightmap.h \
     heightmap.h \
-    mainwindow.h \
     room.h \
+    scancontroller.h \
     scaner.h \
-    scaneraddwindow.h \
-    settingsForms/networkconfigwindow.h \
-    settingsForms/roomparametersinputform.h \
-    settingsForms/scanersetupwindow.h \
-    settingsForms/scaneruartsetupwindow.h \
     udpserver.h \
-    visualization/axisvisualizartor.h \
-    visualization/basevisualizator.h \
-    visualization/camera.h \
-    visualization/heightmapvisualizator.h \
-    visualization/roomvisualizator.h \
-    visualization/scanervisualizator.h \
-    visualization/scanvisualizationwidget.h
+    GUI/Forms/scaneraddwindow.h \
+    GUI/Forms/networkconfigwindow.h \
+    GUI/Forms/roomparametersinputform.h \
+    GUI/Forms/scanersetupwindow.h \
+    GUI/Forms/scaneruartsetupwindow.h \
+    GUI/ScanVisualization/axisvisualizartor.h \
+    GUI/ScanVisualization/basevisualizator.h \
+    GUI/ScanVisualization/camera.h \
+    GUI/ScanVisualization/heightmapvisualizator.h \
+    GUI/ScanVisualization/roomvisualizator.h \
+    GUI/ScanVisualization/scanervisualizator.h \
+    GUI/ScanVisualization/scanvisualizationwidget.h
 
 FORMS += \
-    mainwindow.ui \
-    scaneraddwindow.ui \
-    settingsForms/networkconfigwindow.ui \
-    settingsForms/roomparametersinputform.ui \
-    settingsForms/scanersetupwindow.ui \
-    settingsForms/scaneruartsetupwindow.ui
+    GUI/Forms/scaneraddwindow.ui \
+    GUI/Forms/networkconfigwindow.ui \
+    GUI/Forms/roomparametersinputform.ui \
+    GUI/Forms/scanersetupwindow.ui \
+    GUI/Forms/scaneruartsetupwindow.ui \
+    GUI/mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

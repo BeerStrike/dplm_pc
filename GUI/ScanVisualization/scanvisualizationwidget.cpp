@@ -3,17 +3,17 @@
 #include <QVector3D>
 #include <iostream>
 
-ScanVisualizationWidget::ScanVisualizationWidget(Room  *room,std::vector<Scaner*> *scanerVec,QWidget *pwgt)
+ScanVisualizationWidget::ScanVisualizationWidget(ScanController *sc,QWidget *pwgt)
     :QOpenGLWidget(pwgt),
-    scvs(scanerVec),
-    axvs(room->getRoomLength()*2,room->getRoomWidth()*2,room->getRoomHeight()*2),
-    rmvs(room),
-    hmvs(room->getHeightMap())
+    scvs(sc),
+    axvs(sc),
+    rmvs(sc),
+    hmvs(sc)
 {
-    rm=room;
-    QVector3D camTarget(room->getRoomLength()/2,room->getRoomHeight()/2,room->getRoomWidth()/2);
+    scCtrl=sc;
+    QVector3D camTarget(scCtrl->getRoom()->getRoomWidth()/2,scCtrl->getRoom()->getRoomHeight()/2,scCtrl->getRoom()->getRoomLength()/2);
     cam=new Camera(camTarget);
-    cam->setDistance(4*sqrt(pow(room->getRoomLength()/2,2)+pow(room->getRoomHeight()/2,2)));
+    cam->setDistance(4*sqrt(pow(scCtrl->getRoom()->getRoomLength()/2,2)+pow(scCtrl->getRoom()->getRoomHeight()/2,2)));
     cam->setYaw(45);
 
 }
@@ -24,7 +24,7 @@ ScanVisualizationWidget::~ScanVisualizationWidget()
 }
 
 void ScanVisualizationWidget::setZoom(int percent){
-    double dist=8*sqrt(pow(rm->getRoomLength()/2,2)+pow(rm->getRoomHeight()/2,2))*(100-percent)/100;
+    double dist=8*sqrt(pow(scCtrl->getRoom()->getRoomLength()/2,2)+pow(scCtrl->getRoom()->getRoomHeight()/2,2))*(100-percent)/100;
     cam->setDistance(dist);
     this->repaint();
 }
@@ -63,10 +63,10 @@ void ScanVisualizationWidget::initializeGL()
 
 void ScanVisualizationWidget::paintGL()
 {
+    f->glClearColor(0.0,0.0,0.0,0.0);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     f->glEnable(GL_DEPTH_TEST);
     f->glDepthFunc(GL_LESS);
-
     QMatrix4x4 viewMatrix=cam->getViewMatrix();
     QMatrix4x4 projectionMatrix;
 

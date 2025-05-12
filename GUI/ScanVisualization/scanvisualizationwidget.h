@@ -13,7 +13,8 @@
 #include "axisvisualizartor.h"
 #include "roomvisualizator.h"
 #include "heightmapvisualizator.h"
-#include "room.h"
+#include "scancontroller.h"
+
 class ScanVisualizationWidget : public QOpenGLWidget
 {
     Q_OBJECT
@@ -25,7 +26,7 @@ private:
     AxisVisualizartor axvs;
     RoomVisualizator rmvs;
     HeightMapVisualizator hmvs;
-    Room *rm;
+    ScanController *scCtrl;
     Camera *cam;
     int xPointsMax;
     int zPointsMax;
@@ -34,7 +35,7 @@ private:
     std::vector<GLint> roomIndices;
     void drawSmth(std::vector<GLfloat> &points,std::vector<GLint> &indices,QVector3D colour,QVector3D pos);
 public:
-    ScanVisualizationWidget(Room  *room,std::vector<Scaner*> *scanerVec,QWidget *pwgt);
+    ScanVisualizationWidget(ScanController *sc,QWidget *pwgt);
     ~ScanVisualizationWidget();
     void setZoom(int percent);
     void setCamYaw(float yaw);

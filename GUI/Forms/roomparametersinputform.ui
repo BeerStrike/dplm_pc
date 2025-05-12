@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RoomParametersInputForm</class>
+ <widget class="QDialog" name="RoomParametersInputForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>224</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>224</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>400</width>
+    <height>224</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Введите параметры помещения</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="roomFileNameLabel">
+       <property name="text">
+        <string>Имя файла конфигурации:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="roomFileNameInput"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lengthLabel">
+       <property name="text">
+        <string>Длинна, м:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="lengthInput"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="widthLabel">
+       <property name="text">
+        <string>Ширина, м:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="widthInput"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="heightLabel">
+       <property name="text">
+        <string>Высота, м</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="scanStepLabel">
+       <property name="text">
+        <string>Шаг сканирования, м</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="scanStepInput"/>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="mapStepLabel">
+       <property name="text">
+        <string>Шаг карты высот, м</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLineEdit" name="mapStepInput"/>
+     </item>
+     <item row="7" column="1">
+      <widget class="QPushButton" name="saveBtn">
+       <property name="text">
+        <string>Cохранить</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="heightInput"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="loadBtn">
+       <property name="text">
+        <string>Загрузить</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
