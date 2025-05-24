@@ -51,7 +51,7 @@ void RoomVisualizator::draw()
     ef->glBindVertexArray(vao);
     f->glBindBuffer(GL_ARRAY_BUFFER, coords_vbo);
 
-    f->glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
+    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     f->glEnableVertexAttribArray(0);
     f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
     ef->glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);

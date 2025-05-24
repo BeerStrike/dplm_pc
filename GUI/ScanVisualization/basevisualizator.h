@@ -18,7 +18,7 @@ protected:
     QOpenGLShaderProgram *sh;
     QOpenGLFunctions *f;
     QOpenGLExtraFunctions *ef;
-    GLuint createCordsBuff(QVector<GLdouble> &points);
+    GLuint createCordsBuff(QVector<GLfloat> &points);
     GLuint createIndicesBuff(QVector<GLuint> &indices);
 public:
     explicit BaseVisualizator(ScanController *scController,QObject *parent = nullptr);

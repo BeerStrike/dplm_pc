@@ -1,17 +1,18 @@
 #include "heightmapvisualizator.h"
 
-void HeightMapVisualizator::heigntMapToPoints(QVector<GLdouble> &points,QVector<GLuint> &indices)
+void HeightMapVisualizator::heigntMapToPoints(QVector<GLfloat> &points,QVector<GLuint> &indices)
 {
     points.clear();
     indices.clear();
     int xm=round(scCtrl->getHeightMap()->getLength()/scCtrl->getHeightMap()->getStep())+1;
     int ym=round(scCtrl->getHeightMap()->getWidth()/scCtrl->getHeightMap()->getStep())+1;
-
+    float xstp=scCtrl->getHeightMap()->getLength()/(xm-1);
+    float ystp=scCtrl->getHeightMap()->getWidth()/(ym-1);
     for(int i=0;i<xm;i++)
         for(int j=0;j<ym;j++){
-            points.push_back(j*scCtrl->getHeightMap()->getStep());
+            points.push_back(ystp*j);
             points.push_back(scCtrl->getHeightMap()->getHeightAt(i*scCtrl->getHeightMap()->getStep(),j*scCtrl->getHeightMap()->getStep()));
-            points.push_back(i*scCtrl->getHeightMap()->getStep());
+            points.push_back(xstp*i);
 
         }
     for(int i=0;i<xm;i++){
@@ -41,7 +42,7 @@ void HeightMapVisualizator::draw()
     modelMatrix.translate(pos);
     sh->setUniformValue("model", modelMatrix);
     sh->setUniformValue("colour",colour);
-    QVector<GLdouble> points;
+    QVector<GLfloat> points;
     QVector<GLuint> indices;
     heigntMapToPoints(points,indices);
     GLuint coords_vbo = createCordsBuff(points);
@@ -50,7 +51,7 @@ void HeightMapVisualizator::draw()
     ef->glGenVertexArrays(1, &vao);
     ef->glBindVertexArray(vao);
     f->glBindBuffer(GL_ARRAY_BUFFER, coords_vbo);
-    f->glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
+    f->glVertexAttribPointer(0, 3,GL_FLOAT, GL_FALSE, 0, NULL);
     f->glEnableVertexAttribArray(0);
     f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
     ef->glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);

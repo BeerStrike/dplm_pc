@@ -10,10 +10,9 @@ ScanVisualizationWidget::ScanVisualizationWidget(ScanController *sc,QWidget *pwg
     rmvs(sc),
     hmvs(sc)
 {
-    scCtrl=sc;
-    QVector3D camTarget(scCtrl->getRoom()->getRoomWidth()/2,scCtrl->getRoom()->getRoomHeight()/2,scCtrl->getRoom()->getRoomLength()/2);
+    QVector3D camTarget(sc->getRoom()->getRoomWidth()/2,sc->getRoom()->getRoomHeight()/2,sc->getRoom()->getRoomLength()/2);
     cam=new Camera(camTarget);
-    cam->setDistance(4*sqrt(pow(scCtrl->getRoom()->getRoomLength()/2,2)+pow(scCtrl->getRoom()->getRoomHeight()/2,2)));
+    cam->setDistance(4*sqrt(pow(sc->getRoom()->getRoomLength()/2,2)+pow(sc->getRoom()->getRoomHeight()/2,2)));
     cam->setYaw(45);
 
 }
@@ -24,7 +23,7 @@ ScanVisualizationWidget::~ScanVisualizationWidget()
 }
 
 void ScanVisualizationWidget::setZoom(int percent){
-    double dist=8*sqrt(pow(scCtrl->getRoom()->getRoomLength()/2,2)+pow(scCtrl->getRoom()->getRoomHeight()/2,2))*(100-percent)/100;
+    double dist=4*(100.0f-percent)/100;
     cam->setDistance(dist);
     this->repaint();
 }
@@ -63,7 +62,7 @@ void ScanVisualizationWidget::initializeGL()
 
 void ScanVisualizationWidget::paintGL()
 {
-    f->glClearColor(0.0,0.0,0.0,0.0);
+    f->glClearColor(1.0,1.0,1.0,0.0);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     f->glEnable(GL_DEPTH_TEST);
     f->glDepthFunc(GL_LESS);

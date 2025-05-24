@@ -24,6 +24,8 @@ public:
     Scaner *getScaner(int i);
     void removeScaner(Scaner *);
     int getScanersNum();
+    void pauseScan();
+    void continueScan();
     ~ScanController();
 signals:
     void newData();

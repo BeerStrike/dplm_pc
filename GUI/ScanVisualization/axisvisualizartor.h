@@ -6,7 +6,7 @@ class AxisVisualizartor: public BaseVisualizator
 {
     Q_OBJECT
 private:
-    QVector<GLdouble> points;
+    QVector<GLfloat> points;
     QVector<GLuint> indices;
 public:
     explicit AxisVisualizartor(ScanController *scController,QObject *parent = nullptr);

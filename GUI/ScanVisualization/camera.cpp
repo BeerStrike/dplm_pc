@@ -6,20 +6,20 @@ Camera::Camera(QVector3D camTarget)
     target=camTarget;
 }
 
-void Camera::setYaw(double newYaw)
+void Camera::setYaw(float newYaw)
 {
     if(newYaw>=-90.0&&newYaw<=90.0)
         yaw=newYaw;
 }
 
-void Camera::setPitch(double newPitch)
+void Camera::setPitch(float newPitch)
 {
     int del=newPitch/360;
     newPitch-=newPitch*del;
     pitch=newPitch;
 }
 
-void Camera::setDistance(double newDistance)
+void Camera::setDistance(float newDistance)
 {
     if(newDistance>0)
         distance=newDistance;

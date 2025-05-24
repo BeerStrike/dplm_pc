@@ -1,6 +1,6 @@
 #include "heightmap.h"
 #include <cmath>
-
+#include <random>
 HeightMap::HeightMap(float length,float width,float step,QObject *parent):BaseHeightMap{parent} {
     int sizex=round(length/step)+1;
     int sizey=round(width/step)+1;
@@ -10,6 +10,18 @@ HeightMap::HeightMap(float length,float width,float step,QObject *parent):BaseHe
     map.resize(sizex);
     for(int i=0;i<sizex;i++)
         map[i].resize(sizey);
+    QVector3D point;
+
+    map[map.size()-4][map[0].size()-12].push_back(point);
+    for(int i=0;i<map.size();i++){
+        for(int j=0;j<map[0].size();j++){
+            point.setX(i*stp);
+            point.setY(j*stp);
+            point.setZ((float)rand()/RAND_MAX/100);
+            map[i][j].push_back(point);
+        }
+    }
+
 }
 
 float HeightMap::getLength()

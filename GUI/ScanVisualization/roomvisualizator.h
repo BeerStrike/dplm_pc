@@ -7,7 +7,7 @@ class RoomVisualizator : public BaseVisualizator
 {
     Q_OBJECT
 private:
-    QVector<GLdouble> points;
+    QVector<GLfloat> points;
     QVector<GLuint> indices;
 public:
     explicit RoomVisualizator(ScanController *scController,QObject *parent = nullptr);

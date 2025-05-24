@@ -26,14 +26,7 @@ private:
     AxisVisualizartor axvs;
     RoomVisualizator rmvs;
     HeightMapVisualizator hmvs;
-    ScanController *scCtrl;
     Camera *cam;
-    int xPointsMax;
-    int zPointsMax;
-    float step;
-    std::vector<GLfloat> roomPoints;
-    std::vector<GLint> roomIndices;
-    void drawSmth(std::vector<GLfloat> &points,std::vector<GLint> &indices,QVector3D colour,QVector3D pos);
 public:
     ScanVisualizationWidget(ScanController *sc,QWidget *pwgt);
     ~ScanVisualizationWidget();

@@ -22,6 +22,8 @@ private:
     QPushButton *scanerDeleteBtn;
     QPushButton *scanerSetupBtn;
     QListWidget *scanersList;
+    QPushButton *scanPauseBtn;
+    QPushButton *scanContinueBtn;
     QLabel *scanersListLabel;
     QVBoxLayout *layout;
     UdpServer *udpsrv;
@@ -33,6 +35,8 @@ private slots:
     void on_scanerSetupBtn_clicked();
     void on_scanerDeleteBtn_clicked();
     void on_scanerFindBtn_clicked();
+    void on_scanPauseBtn_clicked();
+    void on_scanContinueBtn_clicked();
     void on_findScaner(QHostAddress IP,int port);
 public slots:
     void on_scanerStatusChanged(Scaner *sc);

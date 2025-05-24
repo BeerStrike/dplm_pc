@@ -23,7 +23,7 @@ void AxisVisualizartor::draw()
     scale.setY(2*scCtrl->getRoom()->getRoomHeight());
     scale.setZ(2*scCtrl->getRoom()->getRoomLength());
     modelMatrix.scale(scale);
-    QVector3D colour(1.0,1.0,1.0);
+    QVector3D colour(0.0,0.0,0.0);
     QVector3D pos(0.0,0.0,0.0);
     modelMatrix.translate(pos);
     sh->setUniformValue("model", modelMatrix);
@@ -36,7 +36,7 @@ void AxisVisualizartor::draw()
     ef->glBindVertexArray(vao);
     f->glBindBuffer(GL_ARRAY_BUFFER, coords_vbo);
 
-    f->glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
+    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     f->glEnableVertexAttribArray(0);
     f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
     ef->glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);

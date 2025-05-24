@@ -8,15 +8,15 @@
 #include <QTcpSocket>
 #include <QSettings>
 #include "heightmap.h"
-#include "room.h"
+class Room;
 
 class Scaner:public QObject
 {
     Q_OBJECT
 public:
-    enum ScanerStatus {unconfigured ,working,not_connected,connected};
+    enum ScanerStatus {unconfigured ,working,not_connected,connected,pause};
     enum Direction {xdyd,xryd,xdyr,xryr};
-    explicit Scaner(Room *rm,QHostAddress IPAdress,int tcpPsort,QObject *parent = nullptr);
+    explicit Scaner(Room *room,QHostAddress IPAdress,int tcpPsort,QObject *parent = nullptr);
     void setParams(QVector3D pos,Direction direction);
     QVector3D getPos();
     Direction getDirection();
@@ -25,6 +25,8 @@ public:
     QHostAddress getIP();
     QString getName();
     BaseHeightMap *getHeightMap();
+    void pauseScan();
+    void continueScan();
     ~Scaner();
 signals:
     void statusChanged(Scaner *sc);

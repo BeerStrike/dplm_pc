@@ -10,10 +10,14 @@ ScanersManadgerWidget::ScanersManadgerWidget(ScanController *sc,int pcPort,int s
     scanerDeleteBtn=new QPushButton(this);
     scanerFindBtn=new QPushButton(this);
     scanerSetupBtn=new QPushButton(this);
+    scanPauseBtn=new QPushButton(this);
+    scanContinueBtn=new QPushButton(this);
     scanerAddBtn->setText("Добавить сканер");
     scanerDeleteBtn->setText("Удалить сканер");
     scanerFindBtn->setText("Поиск сканеров в сети");
     scanerSetupBtn->setText("Настроить сканер");
+    scanPauseBtn->setText("Приостановить сканирование");
+    scanContinueBtn->setText("Возобновить сканирование");
     scanersList=new QListWidget(this);
     scanersListLabel=new QLabel(this);
     scanersListLabel->setText("Cписок сканеров:");
@@ -23,10 +27,15 @@ ScanersManadgerWidget::ScanersManadgerWidget(ScanController *sc,int pcPort,int s
     layout->addWidget(scanerAddBtn);
     layout->addWidget(scanerSetupBtn);
     layout->addWidget(scanerDeleteBtn);
+    layout->addWidget(scanPauseBtn);
+    layout->addWidget(scanContinueBtn);
     connect(scanerAddBtn,SIGNAL(clicked()),this,SLOT(on_scanerAddBtn_clicked()));
     connect(scanerDeleteBtn,SIGNAL(clicked()),this,SLOT(on_scanerDeleteBtn_clicked()));
     connect(scanerFindBtn,SIGNAL(clicked()),this,SLOT(on_scanerFindBtn_clicked()));
     connect(scanerSetupBtn,SIGNAL(clicked()),this,SLOT(on_scanerSetupBtn_clicked()));
+    connect(scanPauseBtn,SIGNAL(clicked()),this,SLOT(on_scanPauseBtn_clicked()));
+    connect(scanContinueBtn,SIGNAL(clicked()),this,SLOT(on_scanContinueBtn_clicked()));
+
     udpsrv=new UdpServer(pcPort,scanersPort,this);
     connect(udpsrv,SIGNAL(findScaner(QHostAddress,int)),this,SLOT(on_findScaner(QHostAddress,int)));
     scanersList->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Expanding);
@@ -64,34 +73,54 @@ void ScanersManadgerWidget::addScaner(QHostAddress IP, int port)
 
 void ScanersManadgerWidget::on_scanerAddBtn_clicked()
 {
-    ScanerAddWindow *w=new ScanerAddWindow(this);
+    ScanerAddWindow *w=new ScanerAddWindow(scCtrl,this);
     w->exec();
-    if(w->isSuccess())
-        addScaner(w->getIP(),w->getPort());
+    Scaner *sc=w->getScaner();
+    if(sc==nullptr)
+        return;
+    connect(sc,SIGNAL(statusChanged(Scaner *)),this,SLOT(on_scanerStatusChanged(Scaner *)));
+    QListWidgetItem * iw=new QListWidgetItem(scanersList);
+    iw->setText(sc->getName()+": нет соединения");
+    scanersList->addItem(iw);
+    sm.insert(sc,iw);
     delete w;
 }
 
 
 void ScanersManadgerWidget::on_scanerSetupBtn_clicked()
 {
-    ScanerSetupWindow* w=new ScanerSetupWindow(sm.key(scanersList->currentItem()),this);
-    w->exec();
-    delete w;
+    if(scanersList->currentItem()){
+        ScanerSetupWindow* w=new ScanerSetupWindow(sm.key(scanersList->currentItem()),this);
+        w->exec();
+        delete w;
+    }
 }
 
 void ScanersManadgerWidget::on_scanerDeleteBtn_clicked()
 {
-    int row=scanersList->currentRow();
-    scCtrl->removeScaner(sm.key(scanersList->currentItem()));
-    sm.remove(sm.key(scanersList->currentItem()));
-    delete scanersList->takeItem(row);
-    scanersList->clearSelection();
+    if(scanersList->currentItem()){
+        int row=scanersList->currentRow();
+        scCtrl->removeScaner(sm.key(scanersList->currentItem()));
+        sm.remove(sm.key(scanersList->currentItem()));
+        delete scanersList->takeItem(row);
+        scanersList->clearSelection();
+    }
 }
 
 
 void ScanersManadgerWidget::on_scanerFindBtn_clicked()
 {
     udpsrv->searchScaners();
+}
+
+void ScanersManadgerWidget::on_scanPauseBtn_clicked()
+{
+    scCtrl->pauseScan();
+}
+
+void ScanersManadgerWidget::on_scanContinueBtn_clicked()
+{
+    scCtrl->continueScan();
 }
 
 ScanersManadgerWidget::~ScanersManadgerWidget(){
@@ -113,6 +142,9 @@ void ScanersManadgerWidget::on_scanerStatusChanged(Scaner * sc)
         break;
     case Scaner::connected:
         statusText="соединено";
+        break;
+    case Scaner::pause:
+        statusText="приостановлен";
         break;
     }
     sm[sc]->setText(sc->getName()+": "+statusText);

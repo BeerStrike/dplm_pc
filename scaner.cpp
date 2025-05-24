@@ -1,4 +1,5 @@
 #include "scaner.h"
+#include "room.h"
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -36,7 +37,7 @@ void Scaner::setParams(QVector3D pos,Direction direction)
     myPos=pos;
     dr=direction;
     lastScanPoint=pos;
-    rm->savePosOfScaner(scanerName,myPos);
+    rm->saveParamsOfScaner(scanerName,myPos,dr);
 }
 
 
@@ -52,6 +53,15 @@ Scaner::Direction Scaner::getDirection()
 
 QVector3D Scaner::getLastScanPoint()
 {
+    if(scanerName=="Lenin"){
+        lastScanPoint.setX(0.2);
+        lastScanPoint.setY(0.15);
+        lastScanPoint.setZ(0.0);
+    }else if(scanerName=="Stalin"){
+        lastScanPoint.setX(0.1);
+        lastScanPoint.setY(0.3);
+        lastScanPoint.setZ(0.0);
+    }
     return lastScanPoint;
 }
 
@@ -76,6 +86,29 @@ QString Scaner::getName()
 BaseHeightMap *Scaner::getHeightMap()
 {
     return &hm;
+}
+
+void Scaner::pauseScan()
+{
+    QJsonObject json;
+    json.insert("Type","Pause scan");
+    QJsonDocument doc;
+    doc.setObject(json);
+    QString j=doc.toJson();
+    sct->write(doc.toJson());
+    sct->waitForBytesWritten();
+}
+
+void Scaner::continueScan()
+{
+
+    QJsonObject json;
+    json.insert("Type","Continue scan");
+    QJsonDocument doc;
+    doc.setObject(json);
+    QString j=doc.toJson();
+    sct->write(doc.toJson());
+    sct->waitForBytesWritten();
 }
 
 void Scaner::sendScanParameters()
@@ -125,7 +158,8 @@ void Scaner::stateResponseHandler(QJsonObject &json)
     QString name=json["Scaner name"].toString();
     if(name.size()>0&&name!=scanerName){
         scanerName=name;
-        //setPos(rm->getPosForScaner(name));
+        myPos=rm->getPosForScaner(name);
+        dr=rm->getDirectionForScaner(name);
         emit statusChanged(this);
     }
 }
@@ -140,11 +174,17 @@ void Scaner::stateHandler(QString stateName)
         if(!myPos.isNull())
             sendScanParameters();
     }
-    else if(stateName=="Working")
+    else if(stateName=="Working"){
         if(myStatus!=working){
             myStatus=working;
             emit statusChanged(this);
         }
+    }else if(stateName=="Pause"){
+        if(myStatus!=pause){
+            myStatus=pause;
+            emit statusChanged(this);
+        }
+    }
 }
 
 void Scaner::scanResultHandler(QJsonObject &json)

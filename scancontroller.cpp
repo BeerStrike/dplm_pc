@@ -64,6 +64,18 @@ int ScanController::getScanersNum()
     return scaners.size();
 }
 
+void ScanController::pauseScan()
+{
+    for(int i=0;i<scaners.size();i++)
+        scaners[i]->pauseScan();
+}
+
+void ScanController::continueScan()
+{
+    for(int i=0;i<scaners.size();i++)
+        scaners[i]->continueScan();
+}
+
 ScanController::~ScanController()
 {
     delete heightMap;

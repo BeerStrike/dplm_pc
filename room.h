@@ -3,6 +3,7 @@
 #include <QVector3D>
 #include <QSettings>
 #include <QObject>
+#include "scaner.h"
 
 class Room :public QObject
 {
@@ -24,7 +25,8 @@ public:
     float getMapStep();
     void changeRoomParams(float l,float w,float h,float scStep,float mpStep);
     QVector3D getPosForScaner(QString name);
-    void savePosOfScaner(QString name,QVector3D pos);
+    Scaner::Direction getDirectionForScaner(QString name);
+    void saveParamsOfScaner(QString name,QVector3D pos,Scaner::Direction dir);
     ~Room();
 };
 

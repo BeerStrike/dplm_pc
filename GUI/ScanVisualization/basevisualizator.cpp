@@ -13,12 +13,12 @@ void BaseVisualizator::initalize(QOpenGLContext *context,QOpenGLShaderProgram *s
     ef=my_context->extraFunctions();
 }
 
-GLuint BaseVisualizator::createCordsBuff(QVector<GLdouble> &points)
+GLuint BaseVisualizator::createCordsBuff(QVector<GLfloat> &points)
 {
     GLuint cords_buff = 0;
     f->glGenBuffers(1, &cords_buff);
     f->glBindBuffer(GL_ARRAY_BUFFER, cords_buff);
-    ef->glBufferData(GL_ARRAY_BUFFER, points.size()*sizeof(GLdouble), &(points[0]), GL_STATIC_DRAW);
+    ef->glBufferData(GL_ARRAY_BUFFER, points.size()*sizeof(GLfloat), &(points[0]), GL_STATIC_DRAW);
     return cords_buff;
 }
 

@@ -22,19 +22,17 @@ float CombinatedHeightMap::getStep()
 
 float CombinatedHeightMap::getHeightAt(float x, float y)
 {
-    float height=0;
-    int n=0;
+    float height=INT_MAX;
     for(int i=0;i<hmv.size();i++){
         float h=hmv[i]->getHeightAt(x,y);
-        if(h!=0){
-            height+=h;
-            n++;
+        if(h<height){
+            height=h;
         }
     }
-    if(n>0)
-        return height/n;
-    else
+    if(height==INT_MAX)
         return 0;
+    else
+        return height;
 }
 
 void CombinatedHeightMap::addHeightMap(BaseHeightMap *hm, QVector3D scpos)

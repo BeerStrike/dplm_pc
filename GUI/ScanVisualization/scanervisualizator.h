@@ -2,17 +2,15 @@
 #define SCANERVISUALIZATOR_H
 #include "scancontroller.h"
 #include "basevisualizator.h"
-#define SCANER_LENGTH 0.06
-#define SCANER_WIDTH 0.02
-#define SCANER_HEIGHT 0.06
+#define SCANER_LENGTH 0.06f
+#define SCANER_WIDTH 0.02f
+#define SCANER_HEIGHT 0.06f
 
 class ScanerVisualizator:public BaseVisualizator
 {
     Q_OBJECT
 private:
-    QVector<GLdouble> points;
-    QVector<GLuint> indices;
-    QVector3D colour;
+    void genergatePointsAndIndices(QVector<GLfloat> &points,QVector<GLuint> &indices);
 public:
     explicit ScanerVisualizator(ScanController *scController,QObject *parent = nullptr);
     void draw() override;

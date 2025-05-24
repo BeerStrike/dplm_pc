@@ -70,15 +70,50 @@ QVector3D Room::getPosForScaner(QString name)
     return pos;
 }
 
-void Room::savePosOfScaner(QString name, QVector3D pos)
+Scaner::Direction Room::getDirectionForScaner(QString name)
 {
-    if(!pos.isNull()){
+    Scaner::Direction dr;
+    if(settings->childGroups().contains(name+"_scaner")){
         settings->beginGroup(name+"_scaner");
-        settings->setValue("X",pos.x());
-        settings->setValue("Y",pos.y());
-        settings->setValue("H",pos.z());
+        QString drs=settings->value("Direction").toString();
+        if(drs=="xdyd")
+            dr=Scaner::xdyd;
+        else if(drs=="xdyr")
+            dr=Scaner::xdyr;
+        else if(drs=="xryd")
+            dr=Scaner::xryd;
+        else if(drs=="xryr")
+            dr=Scaner::xryr;
         settings->endGroup();
     }
+    return dr;
+}
+
+void Room::saveParamsOfScaner(QString name, QVector3D pos,Scaner::Direction dir)
+{
+    if(name=="")
+        return;
+    if(pos.isNull())
+        return;
+    settings->beginGroup(name+"_scaner");
+    settings->setValue("X",pos.x());
+    settings->setValue("Y",pos.y());
+    settings->setValue("H",pos.z());
+    switch(dir){
+        case Scaner::xdyd:
+            settings->setValue("Direction","xdyd");
+            break;
+        case Scaner::xryd:
+            settings->setValue("Direction","xryd");
+            break;
+        case Scaner::xdyr:
+            settings->setValue("Direction","xdyr");
+            break;
+        case Scaner::xryr:
+            settings->setValue("Direction","xryr");
+            break;
+    }
+    settings->endGroup();
 }
 
 Room::~Room()

@@ -7,7 +7,7 @@ class HeightMapVisualizator : public BaseVisualizator
 {
     Q_OBJECT
 private:
-    void heigntMapToPoints(QVector<GLdouble> &points,QVector<GLuint> &indices);
+    void heigntMapToPoints(QVector<GLfloat> &points,QVector<GLuint> &indices);
 public:
     explicit HeightMapVisualizator(ScanController *scController,QObject *parent = nullptr);
     void draw() override;

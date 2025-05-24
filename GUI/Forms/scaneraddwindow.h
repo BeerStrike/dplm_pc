@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QUdpSocket>
-
+#include "scancontroller.h"
 namespace Ui {
 class ScanerAddWindow;
 }
@@ -13,18 +13,16 @@ class ScanerAddWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit ScanerAddWindow(QWidget *parent = nullptr);
+    explicit ScanerAddWindow(ScanController *sc,QWidget *parent = nullptr);
+    Scaner *getScaner();
     ~ScanerAddWindow();
-    QHostAddress getIP();
-    int getPort();
-    bool isSuccess();
+
 private slots:
     void on_connectBtn_clicked();
 
 private:
-    QHostAddress ip;
-    int port;
-    bool success;
+    ScanController *scCtrl;
+    Scaner *scaner;
     Ui::ScanerAddWindow *ui;
 };
 

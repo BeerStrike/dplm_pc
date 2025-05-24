@@ -8,14 +8,14 @@ class Camera: public QObject
     Q_OBJECT
 private:
     QVector3D target;
-    double yaw;
-    double pitch;
-    double distance;
+    float yaw;
+    float pitch;
+    float distance;
 public:
     Camera(QVector3D camTarget);
-    void setYaw(double newYaw);
-    void setPitch(double newPitch);
-    void setDistance(double newDistance);
+    void setYaw(float newYaw);
+    void setPitch(float newPitch);
+    void setDistance(float newDistance);
     QMatrix4x4 getViewMatrix();
 };
 

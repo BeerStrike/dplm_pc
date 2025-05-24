@@ -1,12 +1,17 @@
 #include "scaneraddwindow.h"
 #include "ui_scaneraddwindow.h"
 
-ScanerAddWindow::ScanerAddWindow(QWidget *parent)
-    : QDialog(parent)
+ScanerAddWindow::ScanerAddWindow(ScanController *sc,QWidget *parent)
+    : QDialog(parent),scCtrl(sc)
     , ui(new Ui::ScanerAddWindow)
 {
     ui->setupUi(this);
-    success=false;
+    scaner=nullptr;
+}
+
+Scaner *ScanerAddWindow::getScaner()
+{
+    return scaner;
 }
 
 ScanerAddWindow::~ScanerAddWindow()
@@ -14,28 +19,13 @@ ScanerAddWindow::~ScanerAddWindow()
     delete ui;
 }
 
-QHostAddress ScanerAddWindow::getIP()
-{
-    return ip;
-}
-
-int ScanerAddWindow::getPort()
-{
-    return port;
-}
-
-bool ScanerAddWindow::isSuccess()
-{
-    return success;
-}
 
 void ScanerAddWindow::on_connectBtn_clicked()
 {
     if(!ui->portInput->text().isNull()&&!ui->IPInput->text().isNull()){
-        port=ui->portInput->text().toInt();
+        int port=ui->portInput->text().toInt();
         QHostAddress addr(ui->IPInput->text());
-        ip=addr;
-        success=true;
+        scaner=scCtrl->addScaner(addr,port);
         this->close();
     }
 }
